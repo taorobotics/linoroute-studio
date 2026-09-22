@@ -39,6 +39,7 @@ import {
 // Seven complete rows in the three-column gallery.
 const PAGE_SIZE = 21
 const IMAGE_SOURCE_IDS = new Set([
+  'aiwind-imagegen',
   'awesome-gpt-image-2',
   'youmind-nano-banana-pro',
 ])
@@ -381,7 +382,7 @@ export function PromptLibrary(props: {
         <div className='studio-library-heading'>
           <span className='studio-library-kicker'>
             <Icon size={16} strokeWidth={1.8} aria-hidden='true' />
-            {t('Open-source curation · Traceable sources')}
+            {t('Curated examples · Traceable sources')}
           </span>
           <h1>
             {t(isImage ? 'Image prompt library' : 'Video prompt library')}
@@ -417,11 +418,8 @@ export function PromptLibrary(props: {
         </label>
       </header>
 
-      <div
-        className='studio-library-sources'
-        aria-label={t('Open-source sources')}
-      >
-        <span>{t('Licensed sources · Exact case links retained')}</span>
+      <div className='studio-library-sources' aria-label={t('Prompt sources')}>
+        <span>{t('Attributed sources · Review source terms')}</span>
         {sources.map((source) => (
           <a
             key={source.id}
@@ -506,9 +504,7 @@ export function PromptLibrary(props: {
           <LoaderCircle size={24} aria-hidden='true' />
           <span>
             {t(
-              isImage
-                ? 'Loading licensed image cases'
-                : 'Loading licensed video cases'
+              isImage ? 'Loading image cases' : 'Loading licensed video cases'
             )}
           </span>
         </div>
@@ -868,7 +864,7 @@ export function PromptLibrary(props: {
       <p className='studio-library-disclaimer'>
         {t(
           isImage
-            ? 'Images and prompts are shown from attributed open-source catalogs. Check publicity, trademark and model-provider rules before commercial use.'
+            ? "Images and prompts include attributed source material and newly generated previews. Review each source's terms, publicity rights, trademarks and model-provider rules before reuse."
             : 'Videos and prompts are shown from an attributed open-source gallery. Compatibility labels are recommendations, not claims about the model that generated each video. Review publicity, trademark and provider rules before commercial use.'
         )}
       </p>

@@ -70,6 +70,13 @@ export interface VideoPromptCatalogItem extends CuratedPrompt {
 
 export const PROMPT_SOURCES: PromptSource[] = [
   {
+    id: 'aiwind-imagegen',
+    name: 'AiWind · adapted prompts',
+    url: 'https://www.aiwind.org/',
+    license: 'Source terms',
+    licenseUrl: 'https://www.aiwind.org/terms',
+  },
+  {
     id: 'awesome-gpt-image-2',
     name: 'awesome-gpt-image-2',
     url: 'https://github.com/freestylefly/awesome-gpt-image-2',

@@ -45,7 +45,7 @@ it('shows licensed image cases and sends a selected prompt to image creation', a
 
   fireEvent.click(screen.getByRole('button', { name: '图片提示词库' }))
   expect(screen.getByRole('heading', { name: '图片提示词库' })).toBeVisible()
-  expect(screen.getByText('开源精选 · 可追溯来源')).toBeVisible()
+  expect(screen.getByText('精选案例 · 可追溯来源')).toBeVisible()
   expect(
     screen.getByRole('link', { name: /awesome-gpt-image-2/ })
   ).toHaveAttribute(
@@ -81,21 +81,21 @@ it('opens images at their original aspect ratio and browses the current page', a
 
   fireEvent.click(screen.getByRole('button', { name: '图片提示词库' }))
   const firstCard = await screen.findByRole('article', {
-    name: '幼儿词汇拆解学习卡',
+    name: 'CHINA 中国味道 · 美食立体字',
   })
   const firstImage = within(firstCard).getByRole('img', {
-    name: '幼儿词汇拆解学习卡',
+    name: 'CHINA 中国味道 · 美食立体字',
   })
   const openPreview = within(firstCard).getByRole('button', {
-    name: '查看大图：幼儿词汇拆解学习卡',
+    name: '查看大图：CHINA 中国味道 · 美食立体字',
   })
 
   await user.click(openPreview)
   const dialog = await screen.findByRole('dialog', {
-    name: '图片预览：幼儿词汇拆解学习卡',
+    name: '图片预览：CHINA 中国味道 · 美食立体字',
   })
   expect(
-    within(dialog).getByRole('img', { name: '幼儿词汇拆解学习卡' })
+    within(dialog).getByRole('img', { name: 'CHINA 中国味道 · 美食立体字' })
   ).toHaveAttribute('src', firstImage.getAttribute('src'))
   expect(
     within(dialog).getByRole('button', { name: '上一张图片' })
@@ -104,7 +104,7 @@ it('opens images at their original aspect ratio and browses the current page', a
   await user.click(within(dialog).getByRole('button', { name: '下一张图片' }))
   expect(
     await screen.findByRole('dialog', {
-      name: '图片预览：旅行纪念珐琅徽章',
+      name: '图片预览：植物高级定制 · 卷心菜礼帽',
     })
   ).toBeVisible()
 
@@ -120,7 +120,7 @@ it('filters the visual gallery by model and paginates the results', async () => 
   await screen.findByRole('article', { name: '幼儿词汇拆解学习卡' })
 
   expect(screen.getAllByRole('article')).toHaveLength(21)
-  expect(screen.getByText(/240 个精选案例/)).toBeVisible()
+  expect(screen.getByText(/250 个精选案例/)).toBeVisible()
   expect(
     screen.queryByRole('combobox', { name: '每页数量' })
   ).not.toBeInTheDocument()

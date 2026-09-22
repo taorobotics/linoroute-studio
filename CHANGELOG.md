@@ -2,6 +2,29 @@
 
 User-facing changes to LinoRoute Studio. English is followed by 简体中文.
 
+## 2026-09-22 — Ten new image prompt previews
+
+- Added ten reviewed, newly generated imagegen previews with English/Chinese
+  prompts, AiWind source attribution and source-terms links.
+- Featured **CHINA · Sculpted food typography** as the first image-library
+  card. Existing cases remain; the catalog now contains 250 entries.
+- Stored the ten original PNGs in the dedicated long-term prompt OSS bucket,
+  separate from seven-day user uploads. No provider sample images were copied.
+- Changed the gallery heading to “Curated examples · Traceable sources”:
+  third-party prompt terms are not relabeled as an open-source license.
+- Added coverage for featured ordering, search, attribution and prompt reuse.
+  No API keys, OSS credentials or private configuration are included.
+
+### 简体中文
+
+- 新增 10 张经确认的 imagegen 配图，补齐中英文提示词、AiWind 来源署名和条款链接。
+- 将 **CHINA 中国味道 · 美食立体字** 放在图片提示词库首位，保留原有案例，
+  图库总数由 240 增至 250。
+- 原始 PNG 保存到独立的长期提示词 OSS，与七天清理的用户上传桶分离。
+  本批没有搬运来源网站的配图。
+- 标题调整为“精选案例 · 可追溯来源”，不把第三方提示词误标为开源授权。
+- 增加首位展示、检索、来源标注和使用提示词的测试；不包含任何私有密钥。
+
 ## 2026-09-22 — Image editing, works gallery and video progress
 
 ### Fixed
