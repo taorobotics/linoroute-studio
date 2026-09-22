@@ -1,0 +1,50 @@
+{
+  "name": "linoroute-studio",
+  "version": "0.1.0",
+  "private": false,
+  "description": "An open-source AI creative workspace for image and video generation.",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "homepage": "https://studio.linoroute.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taorobotics/linoroute-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/taorobotics/linoroute-studio/issues"
+  },
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
+    "typecheck": "tsc -b",
+    "lint": "oxlint -c .oxlintrc.json src rsbuild.config.ts",
+    "test": "vitest run",
+    "format:check": "oxfmt --check src rsbuild.config.ts",
+    "format": "oxfmt --write src rsbuild.config.ts"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@lobehub/icons": "^5.10.1",
+    "i18next": "^26.3.4",
+    "lucide-react": "^1.23.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.8"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^2.1.4",
+    "@rsbuild/plugin-react": "^2.1.0",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^26.1.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^29.1.1",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

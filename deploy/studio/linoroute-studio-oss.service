@@ -1,0 +1,33 @@
+# Copyright (C) 2023-2026 QuantumNous
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[Unit]
+Description=LinoRoute Studio OSS signed upload service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+EnvironmentFile=/etc/linoroute-studio/oss.env
+EnvironmentFile=-/etc/linoroute-studio/prompt-oss.env
+ExecStart=/opt/linoroute-studio/oss-venv/bin/python /opt/linoroute-studio/current/config/oss_signer.py --port 4181
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

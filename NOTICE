@@ -1,0 +1,18 @@
+LinoRoute Studio
+Copyright (C) 2026 LinoRoute contributors.
+
+This repository contains Studio UI and supporting code adapted from the
+new-api web client by QuantumNous. Portions remain available under the
+GNU Affero General Public License v3 or later; see LICENSE and the source
+file headers for attribution.
+
+The LinoRoute name, logo and hosted services are trademarks and services of
+their respective owner. This license does not grant permission to use the
+LinoRoute brand to imply endorsement or affiliation.
+
+The model provider names and logos belong to their respective owners. They
+are used only to identify compatible providers in the interface.
+
+Prompt catalogs and remote sample assets may have separate provenance and
+usage terms. Check the source metadata before redistributing or replacing
+those assets in a downstream project.
