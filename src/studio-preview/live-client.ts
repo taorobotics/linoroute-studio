@@ -265,7 +265,13 @@ export async function submitLive(
       path = '/v1/images/edits'
       multipart = new FormData()
       for (const [name, value] of Object.entries(data)) {
-        multipart.set(name, String(value))
+        // Live GPT 2.5 edits reject the gateway's JSON-only `format` alias.
+        // Keep generations unchanged; multipart edits use `output_format`.
+        const fieldName =
+          name === 'format' && GPT25_DOCUMENTED_IDS.includes(model.id)
+            ? 'output_format'
+            : name
+        multipart.set(fieldName, String(value))
       }
       const field =
         GPT25_DOCUMENTED_IDS.includes(model.id) || model.id === 'gpt-image-2'

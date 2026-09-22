@@ -6,7 +6,12 @@ import { useTranslation } from 'react-i18next'
 
 import type { LocalStore, MediaKind } from '../contracts'
 import { safeMediaUrl } from '../live-client'
-import { LIVE_ERRORS, type LiveAsset, type LiveJob } from '../live-types'
+import {
+  LIVE_ERRORS,
+  RETRYABLE_QUERY_ISSUES,
+  type LiveAsset,
+  type LiveJob,
+} from '../live-types'
 import { CreationEmptyState } from './CreationEmptyState'
 import { GenerationLoader } from './GenerationLoader'
 
@@ -135,14 +140,16 @@ export function LiveResultPanel(props: {
 }) {
   const { t } = useTranslation()
   const job = props.job
+  const pending = job?.stage === 'running' || job?.stage === 'queued'
+  const retrying = pending && RETRYABLE_QUERY_ISSUES.includes(props.issue)
   const generating =
-    !props.issue &&
-    (props.busy || job?.stage === 'running' || job?.stage === 'archiving')
+    (!props.issue || retrying) &&
+    (props.busy || pending || job?.stage === 'archiving')
   let label = 'Generation result'
   if (props.busy) label = 'Sending / checking with LinoRoute…'
   else if (job?.stage === 'archiving') {
     label = 'Saving result to your OSS…'
-  } else if (job?.stage === 'running') {
+  } else if (pending) {
     label = 'The upstream is generating your video'
   } else if (job?.stage === 'ready') label = 'Generation completed'
   else if (job?.stage === 'failed') label = 'Generation failed'
@@ -160,7 +167,11 @@ export function LiveResultPanel(props: {
       </div>
       {props.issue && (
         <p role='alert' className='studio-inline-error'>
-          {t(LIVE_ERRORS[props.issue] ?? LIVE_ERRORS.query_failed)}
+          {t(
+            retrying && props.issue !== 'storage_failed'
+              ? 'Status checking was interrupted. Retrying automatically; do not submit again.'
+              : (LIVE_ERRORS[props.issue] ?? LIVE_ERRORS.query_failed)
+          )}
         </p>
       )}
       {job?.stage === 'failed' && !props.issue && (
@@ -185,7 +196,7 @@ export function LiveResultPanel(props: {
         <div className='studio-live-task-id'>
           <span>{t('Task ID')}</span>
           <code>{job.taskId}</code>
-          {job.stage === 'running' && (
+          {pending && (
             <button
               type='button'
               className='studio-secondary-button'
@@ -197,11 +208,11 @@ export function LiveResultPanel(props: {
           )}
         </div>
       )}
-      {job?.stage === 'running' && !props.issue && (
+      {pending && (!props.issue || retrying) && (
         <p className='studio-reference-note'>
           <Video size={16} />
           {t(
-            'Automatic checks run while this tab is visible. You can reopen this task from My works after reconnecting with the same key.'
+            'Checking automatically. Your video will appear when ready, without refreshing. Switching studio sections does not stop checks; returning to this browser tab resumes them.'
           )}
         </p>
       )}
@@ -215,7 +226,6 @@ export function LiveResultPanel(props: {
             active={props.active}
           />
         ))}
-      {job && !generating && <p className='studio-live-prompt'>{job.prompt}</p>}
       {job?.requestedSize && !generating && (
         <p className='studio-reference-note'>
           {t('Requested output size')}:{' '}

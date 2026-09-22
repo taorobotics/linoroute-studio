@@ -2,7 +2,7 @@
 SPDX-License-Identifier: AGPL-3.0-or-later */
 import { Dialog } from '@base-ui/react/dialog'
 import { Sparkles, ArrowRight } from 'lucide-react'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { LocalStore, MediaKind, PromptSeed } from '../contracts'
@@ -147,7 +147,6 @@ export function LiveWorkspace(props: {
   const [checkingFiles, setCheckingFiles] = useState(false)
   const [confirmation, setConfirmation] = useState(false)
   const [pane, setPane] = useState('create')
-  const polls = useRef(0)
   const task = useLiveTask(props.session, props.store)
   const [previousSession, setPreviousSession] = useState(props.session)
   if (previousSession !== props.session) {
@@ -263,33 +262,8 @@ export function LiveWorkspace(props: {
       setPane('create')
     }
   }
-  useEffect(() => {
-    if (
-      !props.active ||
-      task.busy ||
-      task.issue ||
-      task.job?.stage !== 'running' ||
-      polls.current >= 150
-    ) {
-      return
-    }
-    const job = task.job
-    const timer = window.setTimeout(() => {
-      if (!document.hidden) {
-        polls.current++
-        void task.resume(job)
-      }
-    }, 4000)
-    const visible = () => {
-      if (!document.hidden && polls.current < 150) void task.resume(job)
-    }
-    document.addEventListener('visibilitychange', visible)
-    return () => {
-      window.clearTimeout(timer)
-      document.removeEventListener('visibilitychange', visible)
-    }
-  }, [props.active, task])
-  const pending = task.busy || task.job?.stage === 'running'
+  const pending =
+    task.busy || task.job?.stage === 'running' || task.job?.stage === 'queued'
   const disabled = pending || confirmation || checkingFiles
   const promptLimit = imagePromptLimit(model)
   const outputs = imageOutputOptions(model, mode)
@@ -746,7 +720,6 @@ export function LiveWorkspace(props: {
             onBrowsePrompts={props.onBrowsePrompts}
             active={props.active && pane === 'result'}
             onResume={() => {
-              polls.current = 0
               if (task.job) void task.resume(task.job)
             }}
           />
@@ -907,7 +880,6 @@ export function LiveWorkspace(props: {
                   if (!model || !props.session || pending) return
                   setConfirmation(false)
                   setPane('result')
-                  polls.current = 0
                   void task.submit(model, {
                     prompt,
                     ratio,

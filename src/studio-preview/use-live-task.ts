@@ -6,6 +6,7 @@ import type { LocalStore } from './contracts'
 import { queryLive, safeMediaUrl, submitLive } from './live-client'
 import {
   LiveError,
+  RETRYABLE_QUERY_ISSUES,
   type LiveAsset,
   type LiveDraft,
   type LiveJob,
@@ -19,6 +20,7 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
   const [job, setJob] = useState<LiveJob | null>(null)
   const [busy, setBusy] = useState(false)
   const [issue, setIssue] = useState('')
+  const [queryFailures, setQueryFailures] = useState(0)
   const abort = useRef<AbortController | null>(null)
   const mounted = useRef(true)
   useEffect(() => {
@@ -142,6 +144,7 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     abort.current = control
     setBusy(true)
     setIssue('')
+    setQueryFailures(0)
     const id = crypto.randomUUID()
     let current: LiveJob = {
       live: true,
@@ -257,21 +260,27 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     abort.current = control
     setBusy(true)
     setIssue('')
+    // Only a read-only status lookup times out/retries. Never replay a paid POST.
+    const timeout = window.setTimeout(() => control.abort(), 30_000)
     try {
-      await accept(
-        value,
-        await queryLive(
-          session.key,
-          model,
-          value.taskId,
-          control.signal,
-          fetch,
-          value.referenceMode
-        )
+      const result = await queryLive(
+        session.key,
+        model,
+        value.taskId,
+        control.signal,
+        fetch,
+        value.referenceMode
       )
-    } catch {
-      if (mounted.current) setIssue('query_failed')
+      window.clearTimeout(timeout)
+      if (mounted.current) setQueryFailures(0)
+      await accept(value, result)
+    } catch (error) {
+      if (mounted.current) {
+        setIssue(error instanceof LiveError ? error.code : 'query_failed')
+        setQueryFailures((count) => Math.min(count + 1, 3))
+      }
     } finally {
+      window.clearTimeout(timeout)
       abort.current = null
       if (mounted.current) setBusy(false)
     }
@@ -280,6 +289,39 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     if (!session || abort.current || value.owner !== session.owner) return
     setJob(value)
     setIssue(value.issue ?? '')
+    setQueryFailures(0)
   }
+  const resumeRef = useRef(resume)
+  useEffect(() => {
+    resumeRef.current = resume
+  })
+  useEffect(() => {
+    if (
+      !session ||
+      !job?.taskId ||
+      job.owner !== session.owner ||
+      !['queued', 'running'].includes(job.stage) ||
+      busy ||
+      (issue && !RETRYABLE_QUERY_ISSUES.includes(issue))
+    ) {
+      return
+    }
+    const check = () => {
+      if (!document.hidden && navigator.onLine !== false) {
+        void resumeRef.current(job)
+      }
+    }
+    // No attempt limit: long-running videos continue until the upstream finishes.
+    // Back off temporary failures, and catch up when the browser returns online.
+    const delay = Math.min(30_000, 4000 * 2 ** queryFailures)
+    const timer = window.setTimeout(check, delay)
+    document.addEventListener('visibilitychange', check)
+    window.addEventListener('online', check)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('visibilitychange', check)
+      window.removeEventListener('online', check)
+    }
+  }, [job, busy, issue, queryFailures, session])
   return { job, busy, issue, submit, resume, select }
 }

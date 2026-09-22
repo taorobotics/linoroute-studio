@@ -86,6 +86,12 @@ export class LiveError extends Error {
     this.name = 'LiveError'
   }
 }
+export const RETRYABLE_QUERY_ISSUES = [
+  'query_failed',
+  'rate_limit',
+  'invalid_response',
+  'storage_failed',
+]
 export const LIVE_ERRORS: Record<string, string> = {
   unauthorized: 'The key is invalid or has expired. Please reconnect.',
   forbidden: 'This key does not have access to this model or group.',

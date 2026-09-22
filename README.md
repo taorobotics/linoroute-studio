@@ -8,6 +8,8 @@ The default documentation language is English. Translations:
 
 [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md)
 
+Latest changes: [Changelog / 更新日志](CHANGELOG.md).
+
 ## Try it
 
 - **Live demo:** [studio.linoroute.com](https://studio.linoroute.com)

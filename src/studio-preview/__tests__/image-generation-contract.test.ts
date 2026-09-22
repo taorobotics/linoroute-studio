@@ -199,12 +199,37 @@ it('GPT 2.5 editing sends repeated image fields with the selected size', async (
   expect(body.has('image[]')).toBe(false)
   expect(body.get('size')).toBe('2048x2048')
   expect(body.get('quality')).toBe('xhigh')
-  expect(body.get('format')).toBe('webp')
+  expect(body.get('output_format')).toBe('webp')
+  expect(body.has('format')).toBe(false)
   expect(body.get('background')).toBe('transparent')
   expect(body.get('moderation')).toBe('low')
   expect(body.get('n')).toBe('1')
   expect(new Headers(request[0][1].headers).has('Content-Type')).toBe(false)
 })
+
+it.each(['gpt-image-2.5-flare', 'gpt-image-2.5-sunburst'])(
+  '%s maps each edit output format to the upstream multipart field without retrying',
+  async (id) => {
+    for (const format of ['png', 'jpeg', 'webp'] as const) {
+      const transport = vi.fn(async () => reply())
+      await submitLive(
+        'sk-test',
+        model(id),
+        { ...base, mode: 'image', images: [file], format },
+        new AbortController().signal,
+        transport
+      )
+      const calls = transport.mock.calls as unknown as [string, RequestInit][]
+      expect(calls).toHaveLength(1)
+      expect(calls[0][0]).toBe('/studio-api/v1/images/edits')
+      const body = calls[0][1].body as FormData
+      expect(body.get('output_format')).toBe(format)
+      expect(body.has('format')).toBe(false)
+      expect(body.getAll('image')).toEqual([file])
+      expect(body.get('model')).toBe(id)
+    }
+  }
+)
 
 it('GPT 2.5 generation sends the documented request controls', async () => {
   const transport = vi.fn(async () => reply())

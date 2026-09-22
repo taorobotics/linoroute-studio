@@ -4,6 +4,8 @@ LinoRoute Studio 是一个开源的图片与视频 AI 创作工作台，支持�
 
 语言： [English](README.md) · 简体中文 · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md)
 
+最近更新：[更新日志 / Changelog](CHANGELOG.md)。
+
 ## 在线体验
 
 - **在线演示：** [studio.linoroute.com](https://studio.linoroute.com)
