@@ -21,7 +21,7 @@ formats. Changing the upstream URL alone does not make every API compatible.
 
 ## Screenshots
 
-Desktop and mobile UI examples. Preview media are demonstration assets, not
+Desktop UI examples. Preview media are demonstration assets, not
 benchmarks or verified outputs of the model shown in a screenshot.
 
 ![Image workspace](screenshots/image-workspace.png)
@@ -30,9 +30,9 @@ benchmarks or verified outputs of the model shown in a screenshot.
 
 ![GPT-image-2.5 workflow](screenshots/gpt-image-2-5.png)
 
-![Mobile layout](screenshots/mobile-image-workspace.png)
+![Image prompt library](screenshots/image-prompt-library.png)
 
-![My works on mobile](screenshots/mobile-my-works.png)
+![Video prompt library](screenshots/video-prompt-library.png)
 
 ## Features
 

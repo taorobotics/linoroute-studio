@@ -18,7 +18,9 @@
 
 ![動画ワークスペース](screenshots/video-workspace.png)
 
-![モバイルレイアウト](screenshots/mobile-image-workspace.png)
+![画像プロンプトライブラリ（デスクトップ）](screenshots/image-prompt-library.png)
+
+![動画プロンプトライブラリ（デスクトップ）](screenshots/video-prompt-library.png)
 
 ## 主な機能
 

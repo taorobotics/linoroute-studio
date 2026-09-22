@@ -18,7 +18,9 @@ Puedes explorar la interfaz y los prompts sin clave. La generación real requier
 
 ![Espacio de vídeo](screenshots/video-workspace.png)
 
-![Diseño móvil](screenshots/mobile-image-workspace.png)
+![Biblioteca de prompts de imágenes (escritorio)](screenshots/image-prompt-library.png)
+
+![Biblioteca de prompts de vídeo (escritorio)](screenshots/video-prompt-library.png)
 
 ## Funciones
 

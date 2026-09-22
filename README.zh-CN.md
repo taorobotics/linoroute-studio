@@ -20,7 +20,9 @@ LinoRoute Studio 是一个开源的图片与视频 AI 创作工作台，支持�
 
 ![GPT-image-2.5 工作流](screenshots/gpt-image-2-5.png)
 
-![移动端布局](screenshots/mobile-image-workspace.png)
+![图片提示词库（桌面版）](screenshots/image-prompt-library.png)
+
+![视频提示词库（桌面版）](screenshots/video-prompt-library.png)
 
 ## 功能
 

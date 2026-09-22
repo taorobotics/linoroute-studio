@@ -18,7 +18,9 @@ API 키 없이 화면과 프롬프트 라이브러리를 둘러볼 수 있습니
 
 ![비디오 워크스페이스](screenshots/video-workspace.png)
 
-![모바일 레이아웃](screenshots/mobile-image-workspace.png)
+![이미지 프롬프트 라이브러리（데스크톱）](screenshots/image-prompt-library.png)
+
+![비디오 프롬프트 라이브러리（데스크톱）](screenshots/video-prompt-library.png)
 
 ## 주요 기능
 

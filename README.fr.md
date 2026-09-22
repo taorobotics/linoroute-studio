@@ -18,7 +18,9 @@ L’interface et les prompts sont consultables sans clé. La génération réell
 
 ![Espace vidéo](screenshots/video-workspace.png)
 
-![Interface mobile](screenshots/mobile-image-workspace.png)
+![Bibliothèque de prompts image (ordinateur)](screenshots/image-prompt-library.png)
+
+![Bibliothèque de prompts vidéo (ordinateur)](screenshots/video-prompt-library.png)
 
 ## Fonctionnalités
 
