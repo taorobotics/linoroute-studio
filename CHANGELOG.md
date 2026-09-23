@@ -28,6 +28,22 @@ User-facing changes to LinoRoute Studio. English is followed by 简体中文.
 - 新批次已完成 OSS 校验和读取验证，并增加了新批次与详情弹窗的回归测试。
   源码不包含 API Key、OSS 密钥或服务器私有配置。
 
+## 2026-09-23 — Third generated image batch
+
+- Added ten more independently generated AiWind-inspired cases covering fashion,
+  product still life, miniature scenes, illustration, food and concept art.
+- Published their PNG previews to the dedicated long-term prompt OSS bucket and
+  extended the image catalog to 270 traceable cases.
+- Added a regression check for the third batch; no provider credentials or
+  private deployment settings are included in the repository.
+
+### 简体中文
+
+- 新增 10 个独立生成的 AiWind 主题灵感案例，覆盖时装、产品静物、微缩场景、
+  插画、食品与概念艺术；提示词和图片均未复制源站内容。
+- 新 PNG 已上传到独立的长期提示词 OSS，图片提示词库扩展到 270 个可追溯案例。
+- 增加第三批图片的回归测试，仓库不包含供应商凭据或部署私密配置。
+
 ## 2026-09-22 — Ten new image prompt previews
 
 - Added ten reviewed, newly generated imagegen previews with English/Chinese

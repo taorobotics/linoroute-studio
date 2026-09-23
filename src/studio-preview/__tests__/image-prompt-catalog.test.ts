@@ -7,7 +7,7 @@ import { loadImagePromptCatalog } from '../prompt-library-data'
 
 it('ships hundreds of traceable image prompt cases without broken metadata', async () => {
   const imagePromptCatalog = await loadImagePromptCatalog()
-  expect(imagePromptCatalog).toHaveLength(260)
+  expect(imagePromptCatalog).toHaveLength(270)
 
   for (const item of imagePromptCatalog) {
     expect(item.imageUrl).toMatch(/^https:\/\//)
@@ -22,10 +22,10 @@ it('ships hundreds of traceable image prompt cases without broken metadata', asy
 
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2.5'))
-  ).toHaveLength(180)
+  ).toHaveLength(190)
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2'))
-  ).toHaveLength(180)
+  ).toHaveLength(190)
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('Nano Banana Pro'))
   ).toHaveLength(80)

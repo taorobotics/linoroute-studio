@@ -126,7 +126,7 @@ it('filters the visual gallery by model and paginates the results', async () => 
   await screen.findByRole('article', { name: '幼儿词汇拆解学习卡' })
 
   expect(screen.getAllByRole('article')).toHaveLength(21)
-  expect(screen.getByText(/260 个精选案例/)).toBeVisible()
+  expect(screen.getByText(/270 个精选案例/)).toBeVisible()
   expect(
     screen.queryByRole('combobox', { name: '每页数量' })
   ).not.toBeInTheDocument()

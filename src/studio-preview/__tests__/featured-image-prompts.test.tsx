@@ -86,3 +86,28 @@ it('shows the second generated batch with its OSS preview', async () => {
     })
   ).toBeVisible()
 })
+
+it('shows the third generated batch with its OSS preview', async () => {
+  render(<StudioPreviewApp store={createMemoryStore()} locale='zh' />)
+  fireEvent.click(screen.getByRole('button', { name: '图片提示词库' }))
+  fireEvent.change(screen.getByRole('searchbox'), {
+    target: { value: '翡翠温室 · 绿意时装人像' },
+  })
+  const newCase = await screen.findByRole('article', {
+    name: '翡翠温室 · 绿意时装人像',
+  })
+  expect(within(newCase).getByRole('img')).toHaveAttribute(
+    'src',
+    'https://studio.linoroute.com/studio-prompt-assets/prompt-library/images/aiwind-imagegen-20260923-emerald-greenhouse.png'
+  )
+  fireEvent.click(
+    within(newCase).getByRole('button', {
+      name: '查看大图：翡翠温室 · 绿意时装人像',
+    })
+  )
+  expect(
+    await screen.findByRole('dialog', {
+      name: '图片预览：翡翠温室 · 绿意时装人像',
+    })
+  ).toBeVisible()
+})

@@ -3,6 +3,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later */
 
 import type { MediaKind } from './contracts'
 import { AIWIND_BATCH02_IMAGE_PROMPTS } from './image-prompt-catalog-batch02'
+import { AIWIND_BATCH03_IMAGE_PROMPTS } from './image-prompt-catalog-batch03'
 
 export interface PromptSource {
   id: string
@@ -442,6 +443,7 @@ export function loadImagePromptCatalog(): Promise<ImagePromptCatalogItem[]> {
     (module) => [
       ...(module.default as ImagePromptCatalogItem[]),
       ...AIWIND_BATCH02_IMAGE_PROMPTS,
+      ...AIWIND_BATCH03_IMAGE_PROMPTS,
     ]
   )
   return imageCatalogPromise
