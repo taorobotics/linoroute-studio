@@ -2,12 +2,38 @@
 
 User-facing changes to LinoRoute Studio. English is followed by 简体中文.
 
+## 2026-09-23 — Gallery layout and ten more image previews
+
+- Added ten independently written AiWind-inspired image cases with new PNG
+  previews in the dedicated long-term prompt OSS bucket. The image catalog now
+  exposes 260 cases through the loader.
+- Reworked image-library cards into a responsive gallery that preserves each
+  image's natural aspect ratio. Cards now show the complete preview with a
+  compact title/tag caption instead of a wall of prompt text.
+- Clicking an image opens a two-pane detail dialog with the full image,
+  bilingual prompt, source link, source terms, copy action and “Use for image
+  creation”. Video prompt cards keep their existing playable layout.
+- Added OSS checksum/read verification and regression coverage for the new
+  batch and detail flow. No API keys, OSS credentials or private configuration
+  are included.
+
+### 简体中文
+
+- 新增 10 个根据 AiWind 公开案例主题独立撰写的图片提示词，并将新的 PNG
+  保存到独立的长期提示词 OSS；加载后的图片提示词库共 260 个案例。
+- 图片提示词库改为响应式画廊，按原图比例完整展示，不再在卡片里铺满整段提示词，
+  仅保留紧凑标题和标签。
+- 点击图片打开双栏详情弹窗，可查看完整图片、中英文提示词、来源与条款，复制提示词，
+  或直接用于图片创作；视频提示词卡片保持原有可播放布局。
+- 新批次已完成 OSS 校验和读取验证，并增加了新批次与详情弹窗的回归测试。
+  源码不包含 API Key、OSS 密钥或服务器私有配置。
+
 ## 2026-09-22 — Ten new image prompt previews
 
 - Added ten reviewed, newly generated imagegen previews with English/Chinese
   prompts, AiWind source attribution and source-terms links.
 - Featured **CHINA · Sculpted food typography** as the first image-library
-  card. Existing cases remain; the catalog now contains 250 entries.
+  card. Existing cases remain; the catalog then contained 250 entries.
 - Stored the ten original PNGs in the dedicated long-term prompt OSS bucket,
   separate from seven-day user uploads. No provider sample images were copied.
 - Changed the gallery heading to “Curated examples · Traceable sources”:

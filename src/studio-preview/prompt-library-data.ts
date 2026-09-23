@@ -2,6 +2,7 @@
 SPDX-License-Identifier: AGPL-3.0-or-later */
 
 import type { MediaKind } from './contracts'
+import { AIWIND_BATCH02_IMAGE_PROMPTS } from './image-prompt-catalog-batch02'
 
 export interface PromptSource {
   id: string
@@ -438,7 +439,10 @@ let videoCatalogPromise: Promise<VideoPromptCatalogItem[]> | undefined
 
 export function loadImagePromptCatalog(): Promise<ImagePromptCatalogItem[]> {
   imageCatalogPromise ??= import('./image-prompt-catalog.json').then(
-    (module) => module.default as ImagePromptCatalogItem[]
+    (module) => [
+      ...(module.default as ImagePromptCatalogItem[]),
+      ...AIWIND_BATCH02_IMAGE_PROMPTS,
+    ]
   )
   return imageCatalogPromise
 }

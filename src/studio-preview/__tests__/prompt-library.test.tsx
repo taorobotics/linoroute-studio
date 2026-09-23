@@ -63,11 +63,17 @@ it('shows licensed image cases and sends a selected prompt to image creation', a
   ).toHaveAttribute('loading', 'lazy')
   expect(within(card).getByText('GPT Image 2.5')).toBeVisible()
   expect(within(card).getByText('GPT Image 2')).toBeVisible()
-  expect(
-    within(card).getByRole('link', { name: '查看原始案例' })
-  ).toHaveAttribute('href', expect.stringContaining('github.com'))
 
-  fireEvent.click(within(card).getByRole('button', { name: '用于图片创作' }))
+  fireEvent.click(
+    within(card).getByRole('button', { name: '查看大图：幼儿词汇拆解学习卡' })
+  )
+  const dialog = await screen.findByRole('dialog', {
+    name: '图片预览：幼儿词汇拆解学习卡',
+  })
+  expect(
+    within(dialog).getByRole('link', { name: '查看原始案例' })
+  ).toHaveAttribute('href', expect.stringContaining('github.com'))
+  fireEvent.click(within(dialog).getByRole('button', { name: '用于图片创作' }))
   expect(screen.getByRole('heading', { name: '图片创作' })).toBeVisible()
   expect(
     (screen.getByRole('textbox', { name: '提示词' }) as HTMLTextAreaElement)
@@ -120,7 +126,7 @@ it('filters the visual gallery by model and paginates the results', async () => 
   await screen.findByRole('article', { name: '幼儿词汇拆解学习卡' })
 
   expect(screen.getAllByRole('article')).toHaveLength(21)
-  expect(screen.getByText(/250 个精选案例/)).toBeVisible()
+  expect(screen.getByText(/260 个精选案例/)).toBeVisible()
   expect(
     screen.queryByRole('combobox', { name: '每页数量' })
   ).not.toBeInTheDocument()

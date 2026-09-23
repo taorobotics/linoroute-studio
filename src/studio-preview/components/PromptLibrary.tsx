@@ -553,6 +553,7 @@ export function PromptLibrary(props: {
                 className='studio-prompt-card'
                 data-tone={item.tone}
                 data-visual={isCatalogItem(item) ? 'true' : 'false'}
+                data-kind={props.kind}
                 aria-label={title}
               >
                 {isImageCatalogItem(item) ? (
@@ -579,120 +580,125 @@ export function PromptLibrary(props: {
                   />
                 ) : null}
                 <div className='studio-prompt-card-body'>
-                  <div className='studio-prompt-card-index'>
-                    <span>
-                      {String(pageStart + index + 1).padStart(2, '0')}
-                    </span>
-                    <span>{itemCategory}</span>
-                  </div>
-                  <h2>{title}</h2>
-                  <p className='studio-prompt-description'>{description}</p>
-                  <blockquote data-expanded={isExpanded ? 'true' : 'false'}>
-                    {prompt}
-                  </blockquote>
-                  {isCatalogItem(item) && prompt.length > 220 ? (
-                    <button
-                      type='button'
-                      className='studio-prompt-expand'
-                      aria-expanded={isExpanded}
-                      onClick={() =>
-                        setExpandedId(isExpanded ? '' : itemInstanceId)
-                      }
-                    >
-                      {t(isExpanded ? 'Collapse prompt' : 'Expand full prompt')}
-                      <ChevronDown size={14} aria-hidden='true' />
-                    </button>
-                  ) : null}
-                  <div className='studio-prompt-tags'>
-                    {tags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                  <div className='studio-prompt-attribution'>
-                    <span>
-                      {t('Source')}: <strong>{source.name}</strong>
-                    </span>
-                    {isCatalogItem(item) ? (
-                      <a
-                        href={item.sourceCaseUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        aria-label={t('View original case')}
-                      >
-                        {t('Original case')}
-                        <ExternalLink size={12} aria-hidden='true' />
-                      </a>
-                    ) : null}
-                    <a
-                      href={source.licenseUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      aria-label={t('View {{license}} license for {{title}}', {
-                        license: source.license,
-                        title,
-                      })}
-                    >
-                      {source.license}
-                    </a>
-                  </div>
-                  {isCatalogItem(item) ? (
-                    <p className='studio-prompt-creator'>
-                      {isVideoCatalogItem(item) ? (
-                        <>
-                          {t('Generated with')}:{' '}
-                          <strong>{item.generationModel}</strong>
-                          <span aria-hidden='true'> · </span>
-                        </>
+                  {isImageCatalogItem(item) ? (
+                    <>
+                      <div className='studio-prompt-card-index'>
+                        <span>
+                          {String(pageStart + index + 1).padStart(2, '0')}
+                        </span>
+                        <span>{itemCategory}</span>
+                      </div>
+                      <h2>{title}</h2>
+                      <div className='studio-prompt-tags'>
+                        {tags.map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className='studio-prompt-card-index'>
+                        <span>
+                          {String(pageStart + index + 1).padStart(2, '0')}
+                        </span>
+                        <span>{itemCategory}</span>
+                      </div>
+                      <h2>{title}</h2>
+                      <p className='studio-prompt-description'>{description}</p>
+                      <blockquote data-expanded={isExpanded ? 'true' : 'false'}>
+                        {prompt}
+                      </blockquote>
+                      {prompt.length > 220 ? (
+                        <button
+                          type='button'
+                          className='studio-prompt-expand'
+                          aria-expanded={isExpanded}
+                          onClick={() =>
+                            setExpandedId(isExpanded ? '' : itemInstanceId)
+                          }
+                        >
+                          {t(
+                            isExpanded
+                              ? 'Collapse prompt'
+                              : 'Expand full prompt'
+                          )}
+                          <ChevronDown size={14} aria-hidden='true' />
+                        </button>
                       ) : null}
-                      {t('Original author')}:{' '}
-                      <a
-                        href={item.creatorUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                      >
-                        {item.creatorName}
-                      </a>
-                      {isVideoCatalogItem(item) ? (
-                        <>
-                          <span aria-hidden='true'> · </span>
-                          {t('Source record')}: {item.originalSourceLabel}
-                        </>
-                      ) : null}
-                    </p>
-                  ) : null}
-                  <div className='studio-prompt-actions'>
-                    <button
-                      type='button'
-                      className='studio-prompt-copy'
-                      onClick={() => {
-                        void copyText(prompt).then(() => {
-                          setCopiedId(itemInstanceId)
-                          window.setTimeout(() => setCopiedId(''), 1600)
-                        })
-                      }}
-                    >
-                      {copiedId === itemInstanceId ? (
-                        <Check size={16} aria-hidden='true' />
-                      ) : (
-                        <Copy size={16} aria-hidden='true' />
-                      )}
-                      {t(
-                        copiedId === itemInstanceId ? 'Copied' : 'Copy prompt'
-                      )}
-                    </button>
-                    <button
-                      type='button'
-                      className='studio-prompt-use'
-                      onClick={() => props.onUse(prompt)}
-                    >
-                      {t(
-                        isImage
-                          ? 'Use for image creation'
-                          : 'Use for video creation'
-                      )}
-                      <ArrowRight size={16} aria-hidden='true' />
-                    </button>
-                  </div>
+                      <div className='studio-prompt-tags'>
+                        {tags.map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                      <div className='studio-prompt-attribution'>
+                        <span>
+                          {t('Source')}: <strong>{source.name}</strong>
+                        </span>
+                        <a
+                          href={item.sourceCaseUrl}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          aria-label={t('View original case')}
+                        >
+                          {t('Original case')}
+                          <ExternalLink size={12} aria-hidden='true' />
+                        </a>
+                        <a
+                          href={source.licenseUrl}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          aria-label={t(
+                            'View {{license}} license for {{title}}',
+                            {
+                              license: source.license,
+                              title,
+                            }
+                          )}
+                        >
+                          {source.license}
+                        </a>
+                      </div>
+                      <p className='studio-prompt-creator'>
+                        {t('Generated with')}:{' '}
+                        <strong>{item.generationModel}</strong>
+                        <span aria-hidden='true'> · </span>
+                        {t('Original author')}: {item.creatorName}
+                        <span aria-hidden='true'> · </span>
+                        {t('Source record')}: {item.originalSourceLabel}
+                      </p>
+                      <div className='studio-prompt-actions'>
+                        <button
+                          type='button'
+                          className='studio-prompt-copy'
+                          onClick={() => {
+                            void copyText(prompt).then(() => {
+                              setCopiedId(itemInstanceId)
+                              window.setTimeout(() => setCopiedId(''), 1600)
+                            })
+                          }}
+                        >
+                          {copiedId === itemInstanceId ? (
+                            <Check size={16} aria-hidden='true' />
+                          ) : (
+                            <Copy size={16} aria-hidden='true' />
+                          )}
+                          {t(
+                            copiedId === itemInstanceId
+                              ? 'Copied'
+                              : 'Copy prompt'
+                          )}
+                        </button>
+                        <button
+                          type='button'
+                          className='studio-prompt-use'
+                          onClick={() => props.onUse(prompt)}
+                        >
+                          {t('Use for video creation')}
+                          <ArrowRight size={16} aria-hidden='true' />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </article>
             )
@@ -809,12 +815,101 @@ export function PromptLibrary(props: {
                   </Dialog.Close>
                 </div>
 
-                <div className='studio-image-preview-stage'>
-                  <img
-                    src={previewItem.imageUrl}
-                    alt={isZh ? previewItem.imageAltZh : previewItem.imageAltEn}
-                    referrerPolicy='no-referrer'
-                  />
+                <div className='studio-image-preview-content'>
+                  <div className='studio-image-preview-stage'>
+                    <img
+                      src={previewItem.imageUrl}
+                      alt={
+                        isZh ? previewItem.imageAltZh : previewItem.imageAltEn
+                      }
+                      referrerPolicy='no-referrer'
+                    />
+                  </div>
+                  <aside className='studio-image-preview-details'>
+                    <div className='studio-image-preview-details-heading'>
+                      <span>
+                        {isZh ? previewItem.categoryZh : previewItem.categoryEn}
+                      </span>
+                      <strong>
+                        {isZh ? previewItem.titleZh : previewItem.titleEn}
+                      </strong>
+                    </div>
+                    <p className='studio-image-preview-source'>
+                      {t('Source')}:{' '}
+                      <strong>
+                        {getPromptSource(previewItem.sourceId).name}
+                      </strong>
+                      <a
+                        href={previewItem.sourceCaseUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        aria-label={t('View original case')}
+                      >
+                        {t('Original case')}
+                        <ExternalLink size={12} aria-hidden='true' />
+                      </a>
+                      <a
+                        href={getPromptSource(previewItem.sourceId).licenseUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        {getPromptSource(previewItem.sourceId).license}
+                      </a>
+                    </p>
+                    <div className='studio-image-preview-prompt-heading'>
+                      <span>{t('Prompt')}</span>
+                      <button
+                        type='button'
+                        className='studio-image-preview-copy'
+                        onClick={() => {
+                          const value = isZh
+                            ? previewItem.promptZh
+                            : previewItem.promptEn
+                          void copyText(value).then(() => {
+                            setCopiedId(getPromptItemId(previewItem))
+                            window.setTimeout(() => setCopiedId(''), 1600)
+                          })
+                        }}
+                      >
+                        {copiedId === getPromptItemId(previewItem) ? (
+                          <Check size={14} aria-hidden='true' />
+                        ) : (
+                          <Copy size={14} aria-hidden='true' />
+                        )}
+                        {t(
+                          copiedId === getPromptItemId(previewItem)
+                            ? 'Copied'
+                            : 'Copy prompt'
+                        )}
+                      </button>
+                    </div>
+                    <blockquote className='studio-image-preview-prompt'>
+                      {isZh ? previewItem.promptZh : previewItem.promptEn}
+                    </blockquote>
+                    <div className='studio-prompt-tags studio-image-preview-tags'>
+                      {(isZh ? previewItem.tagsZh : previewItem.tagsEn).map(
+                        (tag) => (
+                          <span key={tag}>{tag}</span>
+                        )
+                      )}
+                    </div>
+                    <p className='studio-image-preview-creator'>
+                      {t('Original author')}: {previewItem.creatorName}
+                    </p>
+                    <button
+                      type='button'
+                      className='studio-prompt-use studio-image-preview-use'
+                      onClick={() => {
+                        props.onUse(
+                          isZh ? previewItem.promptZh : previewItem.promptEn
+                        )
+                        setPreviewOpen(false)
+                      }}
+                    >
+                      {t('Use for image creation')}
+                      <ArrowRight size={16} aria-hidden='true' />
+                    </button>
+                  </aside>
                 </div>
 
                 <footer className='studio-image-preview-footer'>

@@ -3,10 +3,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later */
 
 import { expect, it } from 'vitest'
 
-import imagePromptCatalog from '../image-prompt-catalog.json'
+import { loadImagePromptCatalog } from '../prompt-library-data'
 
-it('ships hundreds of traceable image prompt cases without broken metadata', () => {
-  expect(imagePromptCatalog).toHaveLength(250)
+it('ships hundreds of traceable image prompt cases without broken metadata', async () => {
+  const imagePromptCatalog = await loadImagePromptCatalog()
+  expect(imagePromptCatalog).toHaveLength(260)
 
   for (const item of imagePromptCatalog) {
     expect(item.imageUrl).toMatch(/^https:\/\//)
@@ -21,10 +22,10 @@ it('ships hundreds of traceable image prompt cases without broken metadata', () 
 
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2.5'))
-  ).toHaveLength(170)
+  ).toHaveLength(180)
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2'))
-  ).toHaveLength(170)
+  ).toHaveLength(180)
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('Nano Banana Pro'))
   ).toHaveLength(80)
