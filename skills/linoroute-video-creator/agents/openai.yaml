@@ -1,0 +1,6 @@
+interface:
+  display_name: "LinoRoute Video Creator"
+  short_description: "Generate videos with validated LinoRoute settings"
+  default_prompt: "Use $linoroute-video-creator to turn my scene into a model-compatible video generation request."
+policy:
+  allow_implicit_invocation: true

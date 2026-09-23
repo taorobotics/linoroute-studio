@@ -1,0 +1,23 @@
+{
+  "name": "LinoRoute AI 创作",
+  "name_zh": "LinoRoute AI 创作",
+  "name_en": "LinoRoute AI Studio",
+  "description": "通过自然语言调用 LinoRoute 的图片、图生图、文生视频和图生视频能力。",
+  "description_zh": "通过自然语言调用 LinoRoute 的图片、图生图、文生视频和图生视频能力。",
+  "description_en": "Use natural language to create and edit images, text-to-video, and image-to-video with LinoRoute.",
+  "source": "linoroute-ai-studio",
+  "type": "mcp",
+  "version": "0.1.0",
+  "auth_mode": "token",
+  "minWorkbuddyVersion": "4.23.0",
+  "examples_zh": [
+    "用 LinoRoute 生成一张 16:9 的产品海报",
+    "用这张参考图生成一段 5 秒的竖屏视频",
+    "列出我的 LinoRoute API Key 可以使用的模型"
+  ],
+  "examples_en": [
+    "Create a 16:9 product poster with LinoRoute",
+    "Turn this reference image into a 5-second vertical video",
+    "List the models available to my LinoRoute API key"
+  ]
+}

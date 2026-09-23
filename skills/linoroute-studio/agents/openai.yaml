@@ -1,0 +1,6 @@
+interface:
+  display_name: "LinoRoute Studio"
+  short_description: "Route image and video requests through LinoRoute"
+  default_prompt: "Use $linoroute-studio to turn my idea into a validated image or video generation request."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "LinoRoute Image Creator"
+  short_description: "Generate and edit images with LinoRoute models"
+  default_prompt: "Use $linoroute-image-creator to generate an image from my description with appropriate model settings."
+policy:
+  allow_implicit_invocation: true

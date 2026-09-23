@@ -1,0 +1,19 @@
+{
+  "name": "@linoroute/studio-mcp",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Remote MCP Connector for LinoRoute image and video generation.",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.76"
+  }
+}

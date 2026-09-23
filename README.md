@@ -21,6 +21,34 @@ generation requires an API key supplied by the user. LinoRoute is the default
 provider; other providers need matching model names, routes and response
 formats. Changing the upstream URL alone does not make every API compatible.
 
+## Skills
+
+The repository also includes open-source Skills for agent clients and Skill
+marketplaces:
+
+- [`LinoRoute Studio`](skills/linoroute-studio/SKILL.md) — natural-language routing for image and video requests.
+- [`LinoRoute Image Creator`](skills/linoroute-image-creator/SKILL.md) — image generation and editing with model-aware parameters.
+- [`LinoRoute Video Creator`](skills/linoroute-video-creator/SKILL.md) — text-to-video and image-to-video workflows.
+- [`LinoRoute Prompt Engineer`](skills/linoroute-prompt-engineer/SKILL.md) — prompt drafting and optimization.
+
+The Skills never contain API keys or OSS credentials. A host Connector/MCP
+must provide secure user authentication and call the configured LinoRoute API.
+WorkBuddy-ready ZIP packages can be built with
+[`build-workbuddy-packages.ps1`](scripts/build-workbuddy-packages.ps1); each
+package keeps `SKILL.md` at its archive root and is checked against the 3 MB
+upload limit.
+
+## Remote Connector / MCP
+
+For WorkBuddy, the runtime Connector is in
+[`connector/linoroute-mcp`](connector/linoroute-mcp/). It exposes image,
+image-edit, text-to-video and image-to-video tools over HTTPS Streamable HTTP.
+The Connector forwards each user's own LinoRoute API key for that request; no
+provider master key is bundled in the repository. See its
+[`DEPLOYMENT.md`](connector/linoroute-mcp/DEPLOYMENT.md) for Docker, HTTPS and
+WorkBuddy `token-schema.json` setup. The upload archive is generated with
+[`build-workbuddy-connector.ps1`](scripts/build-workbuddy-connector.ps1).
+
 ## Screenshots
 
 Desktop UI examples. Preview media are demonstration assets, not

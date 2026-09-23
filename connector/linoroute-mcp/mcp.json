@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "linoroute": {
+      "type": "streamableHttp",
+      "url": "${MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer ${LINOROUTE_API_KEY}"
+      },
+      "timeout": 30000
+    }
+  }
+}

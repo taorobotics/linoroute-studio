@@ -1,0 +1,6 @@
+interface:
+  display_name: "LinoRoute Prompt Engineer"
+  short_description: "Improve image and video prompts for generation"
+  default_prompt: "Use $linoroute-prompt-engineer to improve my rough creative idea into a ready-to-use prompt."
+policy:
+  allow_implicit_invocation: true

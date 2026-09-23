@@ -1,0 +1,32 @@
+{
+  "title": "LinoRoute 连接配置",
+  "title_en": "LinoRoute Connection",
+  "description": "填写远程 MCP 地址和你的 LinoRoute API Key。凭证保存在本机，不经过 WorkBuddy 云端，只会通过 HTTPS 发送到你填写的 MCP 服务。",
+  "description_en": "Enter the remote MCP URL and your LinoRoute API key. WorkBuddy stores the credential locally; it is not sent through WorkBuddy cloud and is sent only over HTTPS to the MCP service you choose.",
+  "docUrl": "https://linoroute.com",
+  "docLabel": "打开 LinoRoute 获取 API Key",
+  "docLabel_en": "Open LinoRoute to get an API key",
+  "fields": [
+    {
+      "key": "MCP_URL",
+      "label": "远程 MCP 地址",
+      "label_en": "Remote MCP URL",
+      "type": "text",
+      "required": true,
+      "defaultValue": "https://mcp.linoroute.com/mcp",
+      "placeholder": "https://mcp.example.com/mcp",
+      "description": "必须是 HTTPS 的 /mcp 地址；如果使用私有部署，请替换为你的域名。",
+      "description_en": "Use an HTTPS /mcp endpoint. Replace it with your private deployment hostname if needed."
+    },
+    {
+      "key": "LINOROUTE_API_KEY",
+      "label": "LinoRoute API Key",
+      "label_en": "LinoRoute API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "粘贴你的 API Key",
+      "description": "使用你自己的额度调用；不要把 Key 写入 Skill、GitHub 或聊天内容。",
+      "description_en": "Calls use your own balance. Never put the key in a Skill, GitHub, or chat message."
+    }
+  ]
+}
