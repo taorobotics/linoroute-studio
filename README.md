@@ -38,6 +38,37 @@ WorkBuddy-ready ZIP packages can be built with
 package keeps `SKILL.md` at its archive root and is checked against the 3 MB
 upload limit.
 
+## Installation
+
+### GitHub-capable clients
+
+If your AI client supports installing a Skill from GitHub, install the general
+entry point at [`skills/linoroute-studio`](skills/linoroute-studio/). Install
+the image, video or prompt-engineering Skill separately only when you want a
+specialized entry point. If the client requires an archive, use the matching
+ZIP asset from a GitHub Release rather than uploading the whole repository.
+
+You can use this conversational setup request:
+
+> Install the LinoRoute Studio Skill from https://github.com/taorobotics/linoroute-studio/tree/main/skills/linoroute-studio. When image or video generation is needed, connect the LinoRoute MCP at https://mcp.linoroute.com/mcp and ask me for my own LinoRoute API key if it is not configured.
+
+### WorkBuddy users
+
+After the Skill and Connector are published and approved, install both from
+WorkBuddy. The Skill provides the model and parameter guidance; the Connector
+provides the actual API tools. Configure the Connector with
+`https://mcp.linoroute.com/mcp` and the user's own LinoRoute API key. A GitHub
+URL is a source/install reference only; it does not replace WorkBuddy's own
+catalog installation flow.
+
+This one-sentence Chinese setup request can be pasted into a compatible client:
+
+> 请安装 LinoRoute Studio Skill；需要生成图片或视频时连接 https://mcp.linoroute.com/mcp，如果尚未配置就提示我填写自己的 LinoRoute API Key。
+
+Automatic conversational installation depends on whether the host exposes a
+GitHub/package-install action. A Skill cannot silently download itself or
+contain a shared provider key.
+
 ## Remote Connector / MCP
 
 For WorkBuddy, the runtime Connector is in

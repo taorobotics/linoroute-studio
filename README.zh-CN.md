@@ -14,6 +14,20 @@ LinoRoute Studio 是一个开源的图片与视频 AI 创作工作台，支持�
 
 不配置 Key 也可以浏览界面和提示词库。真实生成需要用户自行填写 API Key。项目默认适配 LinoRoute；更换服务商时需要核对模型名、接口路径和响应格式，不能仅靠更换地址保证兼容。
 
+## 安装与使用
+
+如果客户端支持从 GitHub 安装 Skill，可以安装
+[`skills/linoroute-studio`](skills/linoroute-studio/) 作为总入口；图片、视频和提示词 Skill 可以按需单独安装。如果客户端要求 ZIP，请使用 GitHub Release 中对应的压缩包，不要上传整个仓库。
+
+WorkBuddy 用户在 Skill 和连接器发布审核通过后，从 WorkBuddy 中安装两者即可：Skill 负责模型和参数判断，连接器负责实际 API 调用。连接器地址使用
+`https://mcp.linoroute.com/mcp`，API Key 由用户自行填写。GitHub 地址只是源码或安装参考，不能替代 WorkBuddy 自己的安装流程。
+
+可以把下面这句话复制给支持对话式安装的客户端：
+
+> 请安装 LinoRoute Studio Skill；需要生成图片或视频时连接 https://mcp.linoroute.com/mcp，如果尚未配置就提示我填写自己的 LinoRoute API Key。
+
+是否能真正自动安装，取决于客户端是否提供 GitHub 或软件包安装动作；Skill 不会静默下载自己，也不会内置公共 API Key。
+
 ## 截图
 
 ![图片创作](screenshots/image-workspace.png)
