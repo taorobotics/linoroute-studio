@@ -12,10 +12,10 @@ $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 
 $definitions = @(
-  @{ Slug = "linoroute-studio"; DescriptionZh = "通过 LinoRoute 处理图片和视频创作需求，自动选择兼容模型，仅在影响价格或结果时追问关键参数。"; DescriptionEn = "Route image and video requests through LinoRoute with model-aware parameters and minimal clarification." },
-  @{ Slug = "linoroute-image-creator"; DescriptionZh = "通过 LinoRoute 生成或编辑图片，自动匹配模型支持的尺寸、比例、画质、格式、背景和参考图参数。"; DescriptionEn = "Create or edit images through LinoRoute with model-aware size, quality, format, and reference-image controls." },
-  @{ Slug = "linoroute-video-creator"; DescriptionZh = "通过 LinoRoute 生成视频，处理文生视频、图生视频、时长、比例、分辨率和异步任务轮询。"; DescriptionEn = "Create videos through LinoRoute with model-aware text-to-video, duration, ratio, resolution, and polling." },
-  @{ Slug = "linoroute-prompt-engineer"; DescriptionZh = "将简单创意整理成可直接用于图片或视频生成的专业提示词，同时保留主体、风格、构图和限制条件。"; DescriptionEn = "Turn rough ideas into production-ready image or video prompts without changing the user's intent." }
+  @{ Slug = "linoroute-studio"; DisplayNameZh = "LinoRoute Studio"; DisplayNameEn = "LinoRoute Studio"; DescriptionZh = "通过 LinoRoute 处理图片和视频创作需求，自动选择兼容模型，仅在影响价格或结果时追问关键参数。"; DescriptionEn = "Route image and video requests through LinoRoute with model-aware parameters and minimal clarification." },
+  @{ Slug = "linoroute-image-creator"; DisplayNameZh = "LinoRoute 图片创作"; DisplayNameEn = "LinoRoute Image Creator"; DescriptionZh = "通过 LinoRoute 生成或编辑图片，自动匹配模型支持的尺寸、比例、画质、格式、背景和参考图参数。"; DescriptionEn = "Create or edit images through LinoRoute with model-aware size, quality, format, and reference-image controls." },
+  @{ Slug = "linoroute-video-creator"; DisplayNameZh = "LinoRoute 视频创作"; DisplayNameEn = "LinoRoute Video Creator"; DescriptionZh = "通过 LinoRoute 生成视频，处理文生视频、图生视频、时长、比例、分辨率和异步任务轮询。"; DescriptionEn = "Create videos through LinoRoute with model-aware text-to-video, duration, ratio, resolution, and polling." },
+  @{ Slug = "linoroute-prompt-engineer"; DisplayNameZh = "LinoRoute 提示词工程师"; DisplayNameEn = "LinoRoute Prompt Engineer"; DescriptionZh = "将简单创意整理成可直接用于图片或视频生成的专业提示词，同时保留主体、风格、构图和限制条件。"; DescriptionEn = "Turn rough ideas into production-ready image or video prompts without changing the user's intent." }
 )
 
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ("linoroute-workbuddy-" + [Guid]::NewGuid().ToString("N"))
@@ -37,6 +37,8 @@ try {
     $frontmatter = @(
       "---",
       "name: `"$($definition.Slug)`"",
+      "display_name: `"$($definition.DisplayNameZh)`"",
+      "display_name_en: `"$($definition.DisplayNameEn)`"",
       "description: `"$($definition.DescriptionEn)`"",
       "description_zh: `"$($definition.DescriptionZh)`"",
       "description_en: `"$($definition.DescriptionEn)`"",
