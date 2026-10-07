@@ -114,10 +114,12 @@ Studio follows a bring-your-own-key model. Your API key is entered by you and
 sent only with the request that needs it. Do not commit keys to this repository,
 place them in `VITE_*`/`NEXT_PUBLIC_*` variables, or paste them into issues.
 
-The key is remembered in this tab's `sessionStorage`, so refreshing the page
-keeps it. This is browser storage, not a cookie or a cloud account. Local works
-use IndexedDB and do not sync across devices. Disconnect on shared computers;
-browser session restoration can sometimes restore tab storage as well.
+The key is saved in this browser's `localStorage`, so refreshing the page or
+restarting the browser keeps it. This is browser storage, not a cookie or a
+cloud account. Local works use IndexedDB and do not sync across devices. The
+connected-key dialog shows a mask and has a clear button. Clear the key on
+shared computers, and remember that scripts running on this site or browser
+extensions with page access may read browser storage.
 
 The optional OSS flow uses short-lived signed URLs. OSS access keys belong on
 the server-side signer and are never part of the browser bundle. See

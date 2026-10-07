@@ -41,6 +41,7 @@ export interface LiveDraft {
   images?: File[]
   mask?: File
   referenceUrl?: string
+  referenceUrls?: string[]
   generateAudio?: boolean
   quality?: ImageQuality
   format?: ImageFormat
@@ -77,11 +78,15 @@ export interface LiveJob extends MediaJob {
   assets: LiveAsset[]
   duration: number
   issue?: string
+  issueDetail?: string
   referenceAssets?: StudioStoredObject[]
   maskAsset?: StudioStoredObject
 }
 export class LiveError extends Error {
-  constructor(public code: string) {
+  constructor(
+    public code: string,
+    public detail?: string
+  ) {
     super(code)
     this.name = 'LiveError'
   }
@@ -104,7 +109,7 @@ export const LIVE_ERRORS: Record<string, string> = {
   submission_unknown:
     'Submission could not be confirmed. It may already be billed. Check the console before generating again.',
   query_failed:
-    'Status lookup failed. Keep this task ID and resume checking; do not submit again.',
+    'Status lookup failed. Resume checking from this page; do not submit again.',
   invalid_response:
     'The upstream response did not contain a supported result. No sample has been substituted.',
   invalid_parameters:

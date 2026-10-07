@@ -329,7 +329,7 @@ it.each([
   { ratio: '16:9', size: '1024x1024' },
   { size: '9999x9999' },
   { ratio: '9:16' },
-  { prompt: 'a'.repeat(1001) },
+  { prompt: 'a'.repeat(30001) },
 ])(
   'rejects invalid GPT 2.5 input before any paid request: %j',
   async (change) => {

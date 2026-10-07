@@ -18,6 +18,12 @@ const draft = {
   duration: 5,
 }
 
+it('exposes the full 4-15 second range for Seedance 2.0', () => {
+  expect(model('doubao-seedance-2-0-260128').durations).toEqual([
+    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+  ])
+})
+
 it('submits MiniMax H3 text-to-video with the selected resolution and duration', async () => {
   const transport = vi.fn(async (url, init) => {
     expect(url).toBe('/studio-api/tencent-vod/v1/aigc-video')
@@ -114,7 +120,7 @@ it('rejects unsupported MiniMax H3 resolutions before a paid request', async () 
   expect(transport).not.toHaveBeenCalled()
 })
 
-it('submits Seedance 2.5 image-to-video with its selected production settings', async () => {
+it('submits a Seedance 2.5 reference image with its selected production settings', async () => {
   const transport = vi.fn(async (url, init) => {
     expect(url).toBe('/studio-api/api/v3/contents/generations/tasks')
     expect(JSON.parse(String(init?.body))).toEqual({
@@ -124,10 +130,10 @@ it('submits Seedance 2.5 image-to-video with its selected production settings', 
         {
           type: 'image_url',
           image_url: { url: 'https://media.example.com/product.png' },
-          role: 'first_frame',
+          role: 'reference_image',
         },
       ],
-      ratio: 'adaptive',
+      ratio: '16:9',
       duration: 30,
       resolution: '1080p',
       generate_audio: true,
@@ -142,7 +148,7 @@ it('submits Seedance 2.5 image-to-video with its selected production settings', 
       {
         prompt: 'A cinematic product reveal',
         mode: 'image',
-        ratio: 'adaptive',
+        ratio: '16:9',
         duration: 30,
         size: '1080p',
         generateAudio: true,
@@ -153,6 +159,53 @@ it('submits Seedance 2.5 image-to-video with its selected production settings', 
     )
   ).resolves.toMatchObject({ stage: 'running', taskId: 'seedance-25-task' })
   expect(transport).toHaveBeenCalledTimes(1)
+})
+
+it('submits every selected Seedance reference image instead of dropping all but the first', async () => {
+  const transport = vi.fn(async (url, init) => {
+    expect(url).toBe('/studio-api/api/v3/contents/generations/tasks')
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      content: [
+        { type: 'text', text: 'Animate the references as one coherent scene' },
+        {
+          type: 'image_url',
+          image_url: { url: 'https://media.example.com/reference-1.png' },
+          role: 'reference_image',
+        },
+        {
+          type: 'image_url',
+          image_url: { url: 'https://media.example.com/reference-2.png' },
+          role: 'reference_image',
+        },
+      ],
+    })
+    return Response.json({ id: 'seedance-multi-reference-task' })
+  })
+
+  await expect(
+    submitLive(
+      key,
+      model('doubao-seedance-2-5-260628'),
+      {
+        prompt: 'Animate the references as one coherent scene',
+        mode: 'image',
+        ratio: 'adaptive',
+        duration: 5,
+        size: '480p',
+        referenceUrl: 'https://media.example.com/reference-1.png',
+        // This field is added to LiveDraft by the implementation below.
+        referenceUrls: [
+          'https://media.example.com/reference-1.png',
+          'https://media.example.com/reference-2.png',
+        ],
+      } as any,
+      controller(),
+      transport
+    )
+  ).resolves.toMatchObject({
+    stage: 'running',
+    taskId: 'seedance-multi-reference-task',
+  })
 })
 
 it('rejects unsupported Seedance 2.5 resolutions before a paid request', async () => {
@@ -261,6 +314,38 @@ it.each([
   }
 )
 
+it('submits multiple Kling Omni reference images through NinoRoute image_list', async () => {
+  const transport = vi.fn(async (url, init) => {
+    expect(url).toBe('/studio-api/kling/v1/videos/omni-video')
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      model_name: 'kling-v3-omni',
+      image_list: [
+        { image_url: 'https://media.example.com/omni-1.png' },
+        { image_url: 'https://media.example.com/omni-2.png' },
+      ],
+    })
+    return Response.json({ code: 0, data: { task_id: 'omni-multi-task' } })
+  })
+
+  await expect(
+    submitLive(
+      key,
+      model('kling-omni-video'),
+      {
+        ...draft,
+        mode: 'image',
+        referenceUrls: [
+          'https://media.example.com/omni-1.png',
+          'https://media.example.com/omni-2.png',
+        ],
+      } as any,
+      controller(),
+      transport
+    )
+  ).resolves.toMatchObject({ stage: 'running', taskId: 'omni-multi-task' })
+  expect(transport).toHaveBeenCalledTimes(1)
+})
+
 it.each(['veo_3_1', 'veo_3_1-fast'])(
   'sends %s as multipart and lets fetch set the boundary',
   async (id) => {
@@ -363,6 +448,29 @@ it('image 2-C omits unsupported n and decodes actual image response', async () =
     stage: 'ready',
     assets: [{ url: 'https://media.example.com/result.webp' }],
   })
+})
+
+it('submits long prompts without applying the former model-specific short cap', async () => {
+  const longPrompt = 'x'.repeat(12_000)
+  let sent: any
+  const transport = vi.fn(async (_url, init) => {
+    sent = JSON.parse(String(init?.body))
+    return Response.json({
+      created: 123,
+      data: [{ url: 'https://media.example.com/long-prompt.webp' }],
+    })
+  })
+
+  await expect(
+    submitLive(
+      key,
+      model('gpt-image-2-c'),
+      { ...draft, prompt: longPrompt },
+      controller(),
+      transport
+    )
+  ).resolves.toMatchObject({ stage: 'ready' })
+  expect(sent.prompt).toBe(longPrompt)
 })
 
 it('Nano Banana uses native Gemini content and extracts inline image data', async () => {

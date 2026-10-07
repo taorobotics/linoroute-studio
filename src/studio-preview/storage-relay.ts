@@ -8,8 +8,6 @@ const allowedOrigins = new Set([
   'https://studio.linoroute.com',
 ])
 const bearer = /^Bearer [A-Za-z0-9._-]{3,512}$/
-const STORAGE_SIGNER =
-  process.env.STUDIO_STORAGE_SIGNER ?? 'http://127.0.0.1:4181/v1/uploads'
 
 function empty(status: number): Response {
   return new Response(null, {
@@ -49,7 +47,7 @@ export async function relayStorageRequest(
   if (body.byteLength > 8 * 1024) return empty(413)
   try {
     const upstream = await transport(
-      new Request(STORAGE_SIGNER, {
+      new Request('http://127.0.0.1:4181/v1/uploads', {
         method: 'POST',
         headers: {
           Authorization: authorization,

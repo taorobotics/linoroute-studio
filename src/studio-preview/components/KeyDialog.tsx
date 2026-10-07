@@ -119,10 +119,14 @@ export function KeyDialog(props: {
               <div>
                 <strong>{t('API Key storage notice')}</strong>
                 <ul>
-                  <li>{t('Stored in this tab session, not in cookies.')}</li>
                   <li>
                     {t(
-                      'Refreshing keeps it; closing the tab or disconnecting clears it.'
+                      'Stored locally in this browser, not as a server-side setting.'
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      'Refreshing or restarting the browser keeps it; clearing site data or disconnecting removes it.'
                     )}
                   </li>
                   <li>
@@ -154,14 +158,18 @@ export function KeyDialog(props: {
             </a>
           </form>
           {props.connected && (
-            <button
-              className='studio-secondary-button'
-              type='button'
-              disabled={busy}
-              onClick={() => selectOwner(null)}
-            >
-              {t('Disconnect API key')}
-            </button>
+            <div className='studio-saved-key'>
+              <span>{t('Saved API Key')}</span>
+              <code aria-hidden='true'>••••••••</code>
+              <button
+                className='studio-secondary-button'
+                type='button'
+                disabled={busy}
+                onClick={() => selectOwner(null)}
+              >
+                {t('Clear saved API key')}
+              </button>
+            </div>
           )}
           <p className='studio-reference-note'>
             {t(

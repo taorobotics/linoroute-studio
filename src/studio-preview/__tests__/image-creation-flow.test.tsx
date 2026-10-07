@@ -68,7 +68,7 @@ function setup() {
         })
       }
       if (!init) throw new Error('Missing request')
-      sent.push([target, init])
+      if (target.startsWith('/studio-api/')) sent.push([target, init])
       return Response.json({
         data: [{ url: 'https://example.com/result.png' }],
       })
@@ -231,7 +231,7 @@ it('disconnect removes reference files from the new anonymous session', async ()
   })
   await screen.findByRole('button', { name: 'Remove private.png' })
   fireEvent.click(screen.getByRole('button', { name: 'API connected' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Disconnect API key' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Clear saved API key' }))
   await waitFor(() =>
     expect(
       screen.queryByRole('button', { name: 'Remove private.png' })

@@ -23,6 +23,7 @@ import {
   isVideoResolution,
   supportsGeneratedAudio,
   supportsVideoGenerationModes,
+  videoReferenceImageLimit,
   videoResolutionOptions,
 } from './video-output-specs'
 
@@ -90,7 +91,10 @@ async function request(
     if (response.status >= 500) {
       fallback = paid ? 'submission_unknown' : 'query_failed'
     }
-    throw new LiveError(codes[response.status] ?? fallback)
+    throw new LiveError(
+      codes[response.status] ?? fallback,
+      `HTTP ${response.status}`
+    )
   }
   try {
     const value: unknown = await response.json()
@@ -172,14 +176,23 @@ export async function submitLive(
   const configurableVideo = supportsVideoGenerationModes(model)
   const mode =
     draft.mode ??
-    (draft.images?.length || draft.referenceUrl ? 'image' : 'text')
+    (draft.images?.length || draft.referenceUrl || draft.referenceUrls?.length
+      ? 'image'
+      : 'text')
+  const referenceUrls = draft.referenceUrls?.length
+    ? draft.referenceUrls
+    : draft.referenceUrl
+      ? [draft.referenceUrl]
+      : []
+  const ratio = draft.ratio
   if (
     !draft.prompt.trim() ||
     draft.prompt.length > imagePromptLimit(model) ||
     !['text', 'image'].includes(mode) ||
-    !model.ratios.includes(draft.ratio) ||
+    !model.ratios.includes(ratio) ||
     (model.durations && !model.durations.includes(draft.duration)) ||
-    (draft.referenceUrl && !safeMediaUrl(draft.referenceUrl))
+    (draft.referenceUrl && !safeMediaUrl(draft.referenceUrl)) ||
+    referenceUrls.some((url) => !safeMediaUrl(url))
   ) {
     throw new LiveError('invalid_parameters')
   }
@@ -192,10 +205,17 @@ export async function submitLive(
     (isImage &&
       mode === 'image' &&
       (!supportsImageEditing(model) || !images.length)) ||
-    images.length > imageReferenceLimit(model) ||
+    images.length >
+      (isImage
+        ? imageReferenceLimit(model)
+        : videoReferenceImageLimit(model)) ||
+    referenceUrls.length >
+      (isImage
+        ? imageReferenceLimit(model)
+        : videoReferenceImageLimit(model)) ||
     (videoResolutionOptions(model).length > 0 &&
       !isVideoResolution(model, videoResolution)) ||
-    (configurableVideo && mode === 'image' && !draft.referenceUrl) ||
+    (configurableVideo && mode === 'image' && !referenceUrls.length) ||
     images.some(
       (f) =>
         !['image/png', 'image/jpeg', 'image/webp'].includes(f.type) ||
@@ -214,7 +234,6 @@ export async function submitLive(
     data: Json = {}
   let multipart: FormData | undefined
   const prompt = draft.prompt.trim()
-  const ratio = draft.ratio
   const seconds = draft.duration
   if (model.protocol === 'openai-image') {
     const options = imageOutputOptions(model, mode)
@@ -305,15 +324,16 @@ export async function submitLive(
     }
   } else {
     if (images.length) throw new LiveError('invalid_parameters')
-    const ref = mode === 'image' ? draft.referenceUrl : undefined
+    const refs = mode === 'image' ? referenceUrls : []
+    const ref = refs[0]
     if (model.protocol === 'seedance') {
       path = '/api/v3/contents/generations/tasks'
       const content: Json[] = [{ type: 'text', text: prompt }]
-      if (ref) {
+      for (const url of refs) {
         content.push({
           type: 'image_url',
-          image_url: { url: ref },
-          role: 'first_frame',
+          image_url: { url },
+          role: 'reference_image',
         })
       }
       data = {
@@ -342,7 +362,10 @@ export async function submitLive(
         data.image = ref
       }
       if (ref && model.protocol === 'kling-omni') {
-        data.image_list = [{ image_url: ref, type: 'first_frame' }]
+        data.image_list =
+          refs.length === 1
+            ? [{ image_url: ref, type: 'first_frame' }]
+            : refs.map((url) => ({ image_url: url }))
       }
     } else if (model.protocol === 'vod') {
       path = '/tencent-vod/v1/aigc-video'

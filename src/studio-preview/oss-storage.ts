@@ -131,3 +131,63 @@ export async function uploadStudioFile(
     expiresAt: ticket.expiresAt,
   }
 }
+
+/**
+ * Ask the private signer to fetch an upstream result and copy it into OSS.
+ * This avoids relying on the provider CDN's browser CORS policy, which is
+ * commonly different from the policy used by the video element itself.
+ */
+export async function copyStudioFile(
+  key: string,
+  sourceUrl: string,
+  contentType: string,
+  fileName: string,
+  signal: AbortSignal,
+  transport: typeof fetch = fetch
+): Promise<StudioStoredObject> {
+  if (
+    !key ||
+    !sourceUrl ||
+    !contentType ||
+    !fileName ||
+    fileName.length > 255 ||
+    !allowedTypes.has(contentType)
+  ) {
+    throw new LiveError('archive_failed')
+  }
+  let response: Response
+  try {
+    response = await transport('/studio-storage/v1/copy', {
+      method: 'POST',
+      credentials: 'omit',
+      cache: 'no-store',
+      redirect: 'error',
+      signal,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contentType,
+        fileName,
+        purpose: 'result',
+        sourceUrl,
+      }),
+    })
+  } catch {
+    throw new LiveError('archive_failed')
+  }
+  if (!response.ok) throw new LiveError('archive_failed')
+  let ticket: unknown
+  try {
+    ticket = await response.json()
+  } catch {
+    throw new LiveError('archive_failed')
+  }
+  if (!validTicket(ticket)) throw new LiveError('archive_failed')
+  return {
+    url: ticket.readUrl,
+    objectKey: ticket.objectKey,
+    expiresAt: ticket.expiresAt,
+  }
+}

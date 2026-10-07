@@ -35,7 +35,7 @@ it.each([
     )
     fireEvent.click(screen.getByRole('button', { name: 'Videos' }))
     expect(screen.getByRole('combobox', { name: 'Model' })).toHaveTextContent(
-      'MiniMax H3'
+      'Seedance 2.5'
     )
     fireEvent.click(screen.getByRole('button', { name: 'Images' }))
     expect(screen.getByRole('textbox', { name: 'Prompt' })).toHaveValue(

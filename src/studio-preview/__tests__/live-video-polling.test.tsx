@@ -53,7 +53,8 @@ afterEach(() => {
 })
 
 function relay(
-  query: (attempt: number, signal?: AbortSignal | null) => Promise<Response>
+  query: (attempt: number, signal?: AbortSignal | null) => Promise<Response>,
+  mediaContentType = 'video/mp4'
 ) {
   let queries = 0
   let submissions = 0
@@ -71,7 +72,7 @@ function relay(
     }
     if (path === 'https://media.example.com/video.mp4') {
       return new Response('video-fixture', {
-        headers: { 'Content-Type': 'video/mp4' },
+        headers: { 'Content-Type': mediaContentType },
       })
     }
     if (path === '/studio-storage/v1/uploads') {
@@ -127,11 +128,17 @@ it('automatically recovers a transient query error, keeps the loader, and displa
   expect(
     screen.getByRole('status', { name: 'Video generation in progress' })
   ).toBeVisible()
+  expect(
+    screen.queryByRole('button', { name: 'Resume status check' })
+  ).not.toBeInTheDocument()
+  expect(screen.queryByText(/Checking automatically/)).not.toBeInTheDocument()
   await advance(30_000)
   expect(screen.getByLabelText('Generated video')).toHaveAttribute(
     'src',
     storedUrl
   )
+  expect(screen.queryByText('video-upstream')).not.toBeInTheDocument()
+  expect(screen.queryByText('Task ID')).not.toBeInTheDocument()
   expect((await store.list(session.owner))[0]).toMatchObject({
     stage: 'ready',
     taskId: 'video-upstream',
@@ -140,6 +147,49 @@ it('automatically recovers a transient query error, keeps the loader, and displa
   await advance(60_000)
   expect(transport.queries()).toBe(queries)
   expect(transport.submissions()).toBe(1)
+})
+
+it('archives a video when the provider returns a generic content type', async () => {
+  relay(async () => complete(), 'application/octet-stream')
+  const { store } = await openSaved()
+  await advance(4000)
+  expect(screen.getByLabelText('Generated video')).toHaveAttribute(
+    'src',
+    storedUrl
+  )
+  expect((await store.list(session.owner))[0]).toMatchObject({ stage: 'ready' })
+})
+
+it('archives a video through server-side copy when the provider blocks browser fetch', async () => {
+  let copies = 0
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+    const path = String(url)
+    if (
+      path === '/studio-api/api/v3/contents/generations/tasks/video-upstream'
+    ) {
+      return complete()
+    }
+    if (path === '/studio-storage/v1/copy') {
+      copies += 1
+      return Response.json({
+        uploadUrl: storedUrl.replace('signature=read', 'signature=write'),
+        readUrl: storedUrl,
+        objectKey: 'studio/result/video.mp4',
+        expiresAt: Date.now() + 604_800_000,
+      })
+    }
+    if (path === 'https://media.example.com/video.mp4') {
+      throw new TypeError('CORS blocked')
+    }
+    throw new Error(`Unexpected transport path: ${path}`)
+  })
+  await openSaved()
+  await advance(4000)
+  expect(screen.getByLabelText('Generated video')).toHaveAttribute(
+    'src',
+    storedUrl
+  )
+  expect(copies).toBe(1)
 })
 
 it('continues checking a slow video beyond the old 150-query cutoff', async () => {
@@ -212,6 +262,19 @@ it('stops checking a definitively failed generation rather than resubmitting it'
   ).toBeVisible()
   await advance(60_000)
   expect(transport.queries()).toBe(1)
+  expect(transport.submissions()).toBe(0)
+})
+
+it('unblocks a new generation after the status endpoint rejects the task', async () => {
+  const transport = relay(async () => new Response(null, { status: 400 }))
+  await openSaved()
+  await advance(4000)
+  expect(
+    screen.getByRole('heading', { name: 'Generation failed' })
+  ).toBeVisible()
+  expect(
+    screen.getByRole('button', { name: 'Generate with LinoRoute' })
+  ).toBeEnabled()
   expect(transport.submissions()).toBe(0)
 })
 

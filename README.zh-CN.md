@@ -56,7 +56,7 @@ WorkBuddy 用户在 Skill 和连接器发布审核通过后，从 WorkBuddy 中�
 
 Studio 采用用户自带 Key 的方式。API Key 由用户输入，只随需要它的请求发送。不要将 Key 提交到仓库、写入 `VITE_*`/`NEXT_PUBLIC_*` 变量，或粘贴到 Issue 中。
 
-Key 保存在当前标签页的 `sessionStorage` 中，刷新后仍可使用；这不是 Cookie，也不是云端账号。作品记录保存在浏览器 IndexedDB 中，不跨设备同步。公共电脑使用后请断开 Key；部分浏览器的会话恢复功能也可能恢复标签页存储。
+Key 保存在当前浏览器的 `localStorage` 中，刷新或重启浏览器后仍可使用；这不是 Cookie，也不是云端账号。作品记录保存在浏览器 IndexedDB 中，不跨设备同步。已连接时只显示掩码，可在 Key 弹窗中清除。公共电脑使用后请清除 Key；运行在本站的脚本或有页面访问权限的浏览器扩展可能读取浏览器存储。
 
 OSS 使用短时签名 URL。OSS AccessKey 只能放在服务端签名器中，不能进入浏览器构建产物。详见 [`SECURITY.md`](SECURITY.md) 和 [`docs/provider-adapters.md`](docs/provider-adapters.md)。
 

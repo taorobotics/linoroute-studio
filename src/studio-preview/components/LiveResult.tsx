@@ -1,4 +1,4 @@
-import { Video, Download } from 'lucide-react'
+import { Download } from 'lucide-react'
 /* Copyright (C) 2023-2026 QuantumNous
 SPDX-License-Identifier: AGPL-3.0-or-later */
 import { useEffect, useRef, useState } from 'react'
@@ -134,8 +134,8 @@ export function LiveResultPanel(props: {
   store: LocalStore
   busy: boolean
   issue: string
+  issueDetail?: string
   active: boolean
-  onResume: () => void
   onBrowsePrompts?: () => void
 }) {
   const { t } = useTranslation()
@@ -174,6 +174,11 @@ export function LiveResultPanel(props: {
           )}
         </p>
       )}
+      {props.issueDetail && (
+        <p className='studio-reference-note'>
+          {t('Upstream status')}: {props.issueDetail}
+        </p>
+      )}
       {job?.stage === 'failed' && !props.issue && (
         <p role='alert' className='studio-inline-error'>
           {t(LIVE_ERRORS.failed)}
@@ -191,30 +196,6 @@ export function LiveResultPanel(props: {
             onBrowsePrompts={props.onBrowsePrompts}
           />
         </div>
-      )}
-      {job?.taskId && (
-        <div className='studio-live-task-id'>
-          <span>{t('Task ID')}</span>
-          <code>{job.taskId}</code>
-          {pending && (
-            <button
-              type='button'
-              className='studio-secondary-button'
-              disabled={props.busy}
-              onClick={props.onResume}
-            >
-              {t('Resume status check')}
-            </button>
-          )}
-        </div>
-      )}
-      {pending && (!props.issue || retrying) && (
-        <p className='studio-reference-note'>
-          <Video size={16} />
-          {t(
-            'Checking automatically. Your video will appear when ready, without refreshing. Switching studio sections does not stop checks; returning to this browser tab resumes them.'
-          )}
-        </p>
       )}
       {job?.stage === 'ready' &&
         job.assets.map((asset) => (

@@ -14,12 +14,50 @@ import {
   type LiveResult,
   type LiveSession,
 } from './live-types'
-import { uploadStudioFile } from './oss-storage'
+import {
+  copyStudioFile,
+  uploadStudioFile,
+  type StudioStoredObject,
+} from './oss-storage'
+
+const archiveMediaTypes = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'video/mp4',
+  'video/quicktime',
+  'video/webm',
+])
+
+function archiveMime(
+  kind: LiveJob['kind'],
+  declared: string | undefined,
+  url?: string
+) {
+  const contentType = declared?.split(';')[0]?.trim().toLowerCase() ?? ''
+  if (archiveMediaTypes.has(contentType)) return contentType
+  try {
+    const pathname = new URL(url ?? '').pathname.toLowerCase()
+    if (pathname.endsWith('.webm')) return 'video/webm'
+    if (pathname.endsWith('.mov') || pathname.endsWith('.qt')) {
+      return 'video/quicktime'
+    }
+    if (pathname.endsWith('.mp4')) return 'video/mp4'
+    if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) {
+      return 'image/jpeg'
+    }
+    if (pathname.endsWith('.webp')) return 'image/webp'
+  } catch {
+    // Fall through to the media kind when the upstream URL has no extension.
+  }
+  return kind === 'video' ? 'video/mp4' : 'image/png'
+}
 
 export function useLiveTask(session: LiveSession | null, store: LocalStore) {
   const [job, setJob] = useState<LiveJob | null>(null)
   const [busy, setBusy] = useState(false)
   const [issue, setIssue] = useState('')
+  const [issueDetail, setIssueDetail] = useState('')
   const [queryFailures, setQueryFailures] = useState(0)
   const abort = useRef<AbortController | null>(null)
   const mounted = useRef(true)
@@ -51,29 +89,69 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
       await persist({ ...current, ...result, stage: 'archiving', assets })
       const archived: LiveAsset[] = []
       try {
-        for (const asset of assets) {
+        for (const [index, asset] of assets.entries()) {
           let blob: Blob
           if (asset.base64) {
             const bytes = Uint8Array.from(atob(asset.base64), (c) =>
               c.charCodeAt(0)
             )
-            blob = new Blob([bytes], { type: asset.mime ?? 'image/png' })
+            blob = new Blob([bytes], {
+              type: archiveMime(current.kind, asset.mime, asset.url),
+            })
           } else {
             const source = safeMediaUrl(asset.url)
             if (!source) throw new LiveError('archive_failed')
-            const downloaded = await fetch(source, {
-              credentials: 'omit',
-              cache: 'no-store',
-              redirect: 'error',
-              signal: abort.current?.signal,
-            })
-            if (!downloaded.ok) throw new LiveError('archive_failed')
-            const contentType =
-              downloaded.headers.get('Content-Type')?.split(';')[0] ?? ''
-            blob = await downloaded.blob()
-            if (contentType && blob.type !== contentType) {
-              blob = new Blob([blob], { type: contentType })
+            let stored: StudioStoredObject
+            try {
+              stored = await copyStudioFile(
+                session.key,
+                source,
+                archiveMime(current.kind, asset.mime, source),
+                `${current.id}-${index}`,
+                abort.current?.signal ?? new AbortController().signal
+              )
+            } catch {
+              // Keep a browser-side fallback for providers that are reachable
+              // from the browser but not from the signer service.
+              const downloaded = await fetch(source, {
+                credentials: 'omit',
+                cache: 'no-store',
+                // Video CDNs commonly redirect a short-lived URL once before
+                // serving the bytes. Follow that redirect, but keep the final
+                // media URL out of the DOM unless it is still HTTPS.
+                redirect: 'follow',
+                signal: abort.current?.signal,
+              })
+              if (!downloaded.ok) throw new LiveError('archive_failed')
+              const finalUrl = downloaded.url || source
+              if (!safeMediaUrl(finalUrl)) {
+                throw new LiveError('archive_failed')
+              }
+              const payload = await downloaded.blob()
+              blob = new Blob([payload], {
+                // Some video providers return application/octet-stream (or no
+                // type at all), while OSS tickets require an allowed media MIME.
+                type: archiveMime(
+                  current.kind,
+                  downloaded.headers.get('Content-Type') ?? payload.type,
+                  finalUrl
+                ),
+              })
+              stored = await uploadStudioFile(
+                session.key,
+                blob,
+                'result',
+                abort.current?.signal ?? new AbortController().signal
+              )
             }
+            archived.push({
+              id: asset.id,
+              url: stored.url,
+              objectKey: stored.objectKey,
+              expiresAt: stored.expiresAt,
+              mime: archiveMime(current.kind, asset.mime, source),
+            })
+            continue
           }
           const stored = await uploadStudioFile(
             session.key,
@@ -144,6 +222,7 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     abort.current = control
     setBusy(true)
     setIssue('')
+    setIssueDetail('')
     setQueryFailures(0)
     const id = crypto.randomUUID()
     let current: LiveJob = {
@@ -214,10 +293,12 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
         // generation stops so a user never pays for an untraceable task.
         if (!(await persist(current))) return
         if (model.kind === 'video') {
+          const referenceUrls = referenceAssets.map((asset) => asset.url)
           prepared = {
             ...draft,
             images: [],
-            referenceUrl: referenceAssets[0].url,
+            referenceUrl: referenceUrls[0],
+            referenceUrls,
           }
         }
       }
@@ -235,8 +316,12 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
         ...current,
         stage: code === 'submission_unknown' ? 'submission_unknown' : 'failed',
         issue: code,
+        issueDetail: error instanceof LiveError ? error.detail : undefined,
       })
-      if (mounted.current) setIssue(code)
+      if (mounted.current) {
+        setIssue(code)
+        setIssueDetail(error instanceof LiveError ? (error.detail ?? '') : '')
+      }
     } finally {
       abort.current = null
       if (mounted.current) setBusy(false)
@@ -260,6 +345,7 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     abort.current = control
     setBusy(true)
     setIssue('')
+    setIssueDetail('')
     // Only a read-only status lookup times out/retries. Never replay a paid POST.
     const timeout = window.setTimeout(() => control.abort(), 30_000)
     try {
@@ -275,8 +361,24 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
       if (mounted.current) setQueryFailures(0)
       await accept(value, result)
     } catch (error) {
+      const code = error instanceof LiveError ? error.code : 'query_failed'
+      const detail = error instanceof LiveError ? (error.detail ?? '') : ''
+      const terminal = !RETRYABLE_QUERY_ISSUES.includes(code)
+      if (terminal && (value.stage === 'queued' || value.stage === 'running')) {
+        // A definitive query rejection (for example a model/path mismatch)
+        // must not leave the workspace permanently locked in the pending
+        // state. Mark this paid attempt failed, then let the user edit and
+        // submit a new request without refreshing the page.
+        await persist({
+          ...value,
+          stage: 'failed',
+          issue: code,
+          issueDetail: detail || undefined,
+        })
+      }
       if (mounted.current) {
-        setIssue(error instanceof LiveError ? error.code : 'query_failed')
+        setIssue(code)
+        setIssueDetail(detail)
         setQueryFailures((count) => Math.min(count + 1, 3))
       }
     } finally {
@@ -289,6 +391,7 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
     if (!session || abort.current || value.owner !== session.owner) return
     setJob(value)
     setIssue(value.issue ?? '')
+    setIssueDetail(value.issueDetail ?? '')
     setQueryFailures(0)
   }
   const resumeRef = useRef(resume)
@@ -323,5 +426,5 @@ export function useLiveTask(session: LiveSession | null, store: LocalStore) {
       window.removeEventListener('online', check)
     }
   }, [job, busy, issue, queryFailures, session])
-  return { job, busy, issue, submit, resume, select }
+  return { job, busy, issue, issueDetail, submit, resume, select }
 }

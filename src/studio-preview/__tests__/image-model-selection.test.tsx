@@ -41,7 +41,7 @@ function relay(available = ids, result?: Promise<Response>) {
         data: available.map((model_name) => ({ model_name })),
       })
     }
-    if (init?.method === 'POST') {
+    if (init?.method === 'POST' && String(url).startsWith('/studio-api/')) {
       submitted.push(JSON.parse(String(init.body)))
       return (
         result ??
@@ -49,6 +49,9 @@ function relay(available = ids, result?: Promise<Response>) {
           data: [{ url: 'https://media.example.com/result.png' }],
         })
       )
+    }
+    if (init?.method === 'POST' && String(url).startsWith('/studio-storage/')) {
+      return Response.json({ error: 'Archive unavailable in this test' }, { status: 503 })
     }
     throw new Error('Unexpected request')
   })
@@ -171,7 +174,7 @@ it('remembers GPT-image-2 and GPT-image-2.5 independently across switching and r
   expect(
     screen.queryByRole('group', { name: 'Version' })
   ).not.toBeInTheDocument()
-  expect(JSON.stringify({ ...localStorage })).not.toContain(
+  expect(localStorage.getItem('linoroute-studio:live-api-key:v1')).toBe(
     'sk-selection-test-only'
   )
 })
@@ -303,7 +306,7 @@ it.each([
   }
 )
 
-it('restores the chosen version and billing after remount and does not store the key', async () => {
+it('restores the chosen version and billing after remount while persisting the key', async () => {
   relay()
   const first = render(
     <StudioPreviewApp store={createMemoryStore()} locale='en' />
@@ -316,7 +319,7 @@ it('restores the chosen version and billing after remount and does not store the
   await connect()
   expect(screen.getByRole('radio', { name: 'Sunburst' })).toBeChecked()
   expect(screen.getByRole('radio', { name: 'By tokens' })).toBeChecked()
-  expect(JSON.stringify({ ...localStorage })).not.toContain(
+  expect(localStorage.getItem('linoroute-studio:live-api-key:v1')).toBe(
     'sk-selection-test-only'
   )
 })

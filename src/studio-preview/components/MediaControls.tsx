@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { MediaDraft, MediaKind } from '../contracts'
 import { DEMO_IMAGE_MODELS, DEMO_VIDEO_MODELS } from '../fixtures'
+import { STUDIO_PROMPT_INPUT_LIMIT } from '../image-output-specs'
 import { ReferenceMedia } from './ReferenceMedia'
 import { StudioImageModelSelect } from './StudioImageModelSelect'
 import { StudioModelSelect } from './StudioModelSelect'
@@ -126,11 +127,12 @@ export function MediaControls(props: {
               id={`${fieldId}-prompt`}
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
-              maxLength={4000}
+              maxLength={STUDIO_PROMPT_INPUT_LIMIT}
               placeholder={t(example)}
             />
             <span className='studio-prompt-count' aria-hidden='true'>
-              {prompt.length.toLocaleString()} / 4,000
+              {prompt.length.toLocaleString()} /{' '}
+              {STUDIO_PROMPT_INPUT_LIMIT.toLocaleString()}
             </span>
           </div>
         </div>

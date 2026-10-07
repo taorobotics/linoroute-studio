@@ -2,10 +2,54 @@
 SPDX-License-Identifier: AGPL-3.0-or-later */
 import { expect, it, vi } from 'vitest'
 
-import { uploadStudioFile } from '../oss-storage'
+import { copyStudioFile, uploadStudioFile } from '../oss-storage'
 
 const key = 'sk-oss-test-only'
 const signal = () => new AbortController().signal
+
+it('copies a remote result through the server-side OSS archiver', async () => {
+  const transport = vi.fn(async (url, init) => {
+    expect(url).toBe('/studio-storage/v1/copy')
+    expect(init).toMatchObject({
+      method: 'POST',
+      credentials: 'omit',
+      cache: 'no-store',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    expect(JSON.parse(String(init?.body))).toEqual({
+      contentType: 'video/mp4',
+      fileName: 'result.mp4',
+      purpose: 'result',
+      sourceUrl: 'https://media.example.com/result.mp4',
+    })
+    return Response.json({
+      uploadUrl:
+        'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/id.mp4?signature=upload',
+      readUrl:
+        'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/id.mp4?signature=read',
+      objectKey: 'studio/result/id.mp4',
+      expiresAt: 700_000,
+    })
+  })
+
+  await expect(
+    copyStudioFile(
+      key,
+      'https://media.example.com/result.mp4',
+      'video/mp4',
+      'result.mp4',
+      signal(),
+      transport
+    )
+  ).resolves.toEqual({
+    url: 'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/id.mp4?signature=read',
+    objectKey: 'studio/result/id.mp4',
+    expiresAt: 700_000,
+  })
+})
 
 it('uploads an approved local image with a short-lived same-purpose ticket', async () => {
   const file = new File(['image-bytes'], 'portrait.png', { type: 'image/png' })

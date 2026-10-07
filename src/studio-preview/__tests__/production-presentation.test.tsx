@@ -10,6 +10,9 @@ import { createMemoryStore } from '../memory-store'
 it('offers corresponding source and licenses from the resources menu', async () => {
   const user = userEvent.setup()
   render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
+  expect(
+    screen.getByRole('link', { name: 'Open source repository on GitHub' })
+  ).toHaveAttribute('href', 'https://github.com/taorobotics/linoroute-studio')
   await user.click(screen.getByRole('button', { name: 'Resources' }))
   expect(
     await screen.findByRole('link', { name: 'Source and licenses' })
@@ -71,8 +74,9 @@ it('uses brand artwork for every video model in both the menu and selected state
     'Seedance 2.0',
     'Seedance 2.0 Fast',
     'Kling Video 3.0',
+    'Kling Video 3.0 Omni',
     'Veo 3.1',
-    'Gemini Omni',
+    'Veo 3.1 Fast',
     'Grok Imagine Video',
   ]) {
     await user.click(picker)
@@ -86,4 +90,28 @@ it('uses brand artwork for every video model in both the menu and selected state
       picker.querySelector('.lr-model-mark img, .lr-model-mark svg path')
     ).not.toBeNull()
   }
+})
+
+it('shows video modes and output controls before an API key is configured', () => {
+  render(
+    <StudioPreviewApp
+      store={createMemoryStore()}
+      locale='en'
+      initialRoute='video'
+    />
+  )
+
+  expect(screen.getByRole('radio', { name: 'Text to video' })).toBeChecked()
+  expect(screen.getByRole('radio', { name: 'Image to video' })).toBeEnabled()
+  expect(screen.getByRole('radio', { name: '480P' })).toBeChecked()
+  expect(
+    screen.getByRole('combobox', { name: 'Duration (seconds)' })
+  ).toHaveValue('5')
+  expect(screen.getByRole('button', { name: '16:9' })).toBeVisible()
+  expect(
+    screen.getByRole('button', { name: 'Connect key to generate' })
+  ).toBeEnabled()
+
+  fireEvent.click(screen.getByRole('radio', { name: 'Image to video' }))
+  expect(screen.getByLabelText('Choose reference images')).toBeInTheDocument()
 })

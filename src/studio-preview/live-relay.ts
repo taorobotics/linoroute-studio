@@ -2,7 +2,6 @@
 SPDX-License-Identifier: AGPL-3.0-or-later */
 // Imported by the local dev server only. Never bundle this into the browser entry.
 const ORIGIN = 'http://127.0.0.1:4178'
-const UPSTREAM = process.env.STUDIO_API_UPSTREAM ?? 'https://linoroute.com'
 const POST_PATHS = new Set([
   '/v1/images/generations',
   '/v1/images/edits',
@@ -67,7 +66,7 @@ export async function relayRequest(
     )
   }
   try {
-    const response = await transport(`${UPSTREAM}${path}`, {
+    const response = await transport(`https://linoroute.com${path}`, {
       method: request.method,
       headers,
       body,

@@ -34,6 +34,7 @@ import {
   isVideoResolution,
   supportsGeneratedAudio,
   supportsVideoGenerationModes,
+  videoReferenceImageLimit,
   videoResolutionOptions,
 } from '../video-output-specs'
 import {
@@ -112,12 +113,16 @@ export function LiveWorkspace(props: {
   const [modelId, setModelId] = useState(() =>
     props.kind === 'image'
       ? initialImageModelId(models, selectionMode)
-      : (models[0]?.id ?? '')
+      : (models.find((entry) => entry.id === 'doubao-seedance-2-5-260628')
+          ?.id ??
+        models[0]?.id ??
+        '')
   )
   const model = models.find((m) => m.id === modelId)
   const seedance25 = isSeedance25(model)
   const configurableVideo = supportsVideoGenerationModes(model)
   const videoResolutions = videoResolutionOptions(model)
+  const videoReferenceLimit = videoReferenceImageLimit(model)
   const imageChoice = gptImageOption(model)
   const approximateSize = GPT25_PER_REQUEST_IDS.includes(modelId)
   const [prompt, setPrompt] = useState('')
@@ -276,7 +281,9 @@ export function LiveWorkspace(props: {
   const validReference =
     props.kind === 'image'
       ? mode === 'text' || (supportsImageEditing(model) && images.length > 0)
-      : !configurableVideo || mode === 'text' || images.length === 1
+      : !configurableVideo ||
+        mode === 'text' ||
+        (images.length >= 1 && images.length <= videoReferenceLimit)
   const validRequest =
     !requestOptions ||
     (requestOptions.qualities.includes(quality) &&
@@ -523,9 +530,16 @@ export function LiveWorkspace(props: {
                     onChange={(event) => setPrompt(event.target.value)}
                   />
                   <span className='studio-prompt-count'>
-                    {prompt.length} / {promptLimit.toLocaleString()}
+                    {prompt.length.toLocaleString()} /{' '}
+                    {promptLimit.toLocaleString()}
                   </span>
                 </div>
+                <p className='studio-reference-note'>
+                  {t(
+                    'Studio accepts up to {{count}} prompt characters. The upstream model may enforce a shorter limit; prompts are never silently truncated.',
+                    { count: promptLimit.toLocaleString() }
+                  )}
+                </p>
               </div>
               {prompt.length > promptLimit && (
                 <p className='studio-inline-error' role='alert'>
@@ -557,17 +571,29 @@ export function LiveWorkspace(props: {
                   <>
                     <ReferenceImageInput
                       files={images}
-                      onChange={(next) => setImages(next.slice(0, 1))}
-                      label={t('First-frame image (optional)')}
-                      inputLabel={t('Choose first-frame image')}
-                      maxFiles={1}
+                      onChange={(next) =>
+                        setImages(next.slice(0, videoReferenceLimit))
+                      }
+                      label={t(
+                        videoReferenceLimit > 1
+                          ? 'Reference images (optional)'
+                          : 'First-frame image (optional)'
+                      )}
+                      inputLabel={t(
+                        videoReferenceLimit > 1
+                          ? 'Choose reference images'
+                          : 'Choose first-frame image'
+                      )}
+                      maxFiles={videoReferenceLimit}
                       allowMask={false}
                       disabled={disabled}
                       onBusyChange={setCheckingFiles}
                     />
                     <p className='studio-reference-note'>
                       {t(
-                        'The selected first-frame image is uploaded to your private OSS before the paid video request. You do not need to paste a link.'
+                        videoReferenceLimit > 1
+                          ? 'Selected reference images are uploaded to your private OSS before the paid video request. Every selected image is sent as a reference image. You do not need to paste a link.'
+                          : 'The selected first-frame image is uploaded to your private OSS before the paid video request. You do not need to paste a link.'
                       )}
                     </p>
                   </>
@@ -671,7 +697,7 @@ export function LiveWorkspace(props: {
               {seedance25 && (
                 <p className='studio-reference-note'>
                   {t(
-                    'Seedance 2.5 supports text-to-video and first-frame image-to-video, up to 30 seconds. 480P is the economical default.'
+                    'Seedance 2.5 supports text-to-video and reference-image-to-video with up to 30 reference images. Every uploaded image is sent as a reference image; first-frame/first-and-last-frame modes are not selected here. 480P is the economical default.'
                   )}
                 </p>
               )}
@@ -717,11 +743,9 @@ export function LiveWorkspace(props: {
             store={props.store}
             busy={task.busy}
             issue={task.issue}
+            issueDetail={task.issueDetail}
             onBrowsePrompts={props.onBrowsePrompts}
             active={props.active && pane === 'result'}
-            onResume={() => {
-              if (task.job) void task.resume(task.job)
-            }}
           />
         }
       />
@@ -828,10 +852,22 @@ export function LiveWorkspace(props: {
                       </dd>
                       <dt>{t('Resolution')}</dt>
                       <dd>{size.toUpperCase()}</dd>
-                      {mode === 'image' && (
+                      {mode === 'image' && images.length > 0 && (
                         <>
-                          <dt>{t('First-frame image')}</dt>
-                          <dd>{t('Included')}</dd>
+                          <dt>
+                            {t(
+                              videoReferenceLimit > 1
+                                ? 'Reference images'
+                                : 'First-frame image'
+                            )}
+                          </dt>
+                          <dd>
+                            {videoReferenceLimit > 1
+                              ? t('{{count}} selected', {
+                                  count: images.length,
+                                })
+                              : t('Included')}
+                          </dd>
                         </>
                       )}
                       {seedance25 && (

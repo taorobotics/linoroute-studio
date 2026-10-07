@@ -11,6 +11,7 @@ import { createMemoryStore } from '../memory-store'
 const key = 'sk-ui-test-only'
 const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13])
 beforeEach(() => {
+  localStorage.clear()
   sessionStorage.clear()
   vi.stubGlobal(
     'createImageBitmap',
@@ -18,6 +19,7 @@ beforeEach(() => {
   )
 })
 afterEach(() => {
+  localStorage.clear()
   sessionStorage.clear()
   vi.unstubAllGlobals()
 })
@@ -42,6 +44,18 @@ function mockRelay(
         ],
       })
     }
+    if (String(url).endsWith('/studio-storage/v1/copy')) {
+      const body = JSON.parse(String(init?.body ?? '{}')) as {
+        contentType?: string
+      }
+      const extension = body.contentType?.startsWith('video/') ? 'mp4' : 'png'
+      return Response.json({
+        uploadUrl: `https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/archived.${extension}?signature=write`,
+        readUrl: `https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/archived.${extension}?signature=read`,
+        objectKey: `studio/result/archived.${extension}`,
+        expiresAt: 1_800_000_000_000,
+      })
+    }
     if (init?.method === 'POST') return post()
     return Response.json({
       id: 'cgt-1',
@@ -49,6 +63,14 @@ function mockRelay(
       content: { video_url: 'https://media.example.com/real.mp4' },
     })
   })
+}
+function paidPosts(transport: {
+  mock: { calls: Array<[unknown, RequestInit?]> }
+}) {
+  return transport.mock.calls.filter(
+    (call) =>
+      call[1]?.method === 'POST' && String(call[0]).includes('/studio-api/')
+  )
 }
 async function connect() {
   fireEvent.click(screen.getByRole('button', { name: 'Configure API key' }))
@@ -71,6 +93,16 @@ it('displays GPT-image-2 while paid requests retain the original gateway model I
     if (String(url).endsWith('/api/pricing')) {
       return Response.json({ data: [{ model_name: 'gpt-image-2-c' }] })
     }
+    if (String(url).endsWith('/studio-storage/v1/copy')) {
+      return Response.json({
+        uploadUrl:
+          'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/actual.png?signature=write',
+        readUrl:
+          'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/result/actual.png?signature=read',
+        objectKey: 'studio/result/actual.png',
+        expiresAt: 1_800_000_000_000,
+      })
+    }
     submitted = JSON.parse(String(init?.body))
     return Response.json({
       data: [{ url: 'https://media.example.com/actual.png' }],
@@ -86,6 +118,26 @@ it('displays GPT-image-2 while paid requests retain the original gateway model I
   fireEvent.click(screen.getByRole('button', { name: 'Confirm and generate' }))
   await screen.findByRole('img', { name: 'Generated image' })
   expect(submitted).toMatchObject({ model: 'gpt-image-2-c' })
+})
+
+it('allows the Studio prompt editor to hold tens of thousands of characters', async () => {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+    if (String(url).endsWith('/v1/models')) {
+      return Response.json({ data: [{ id: 'gpt-image-2-c' }] })
+    }
+    if (String(url).endsWith('/api/pricing')) {
+      return Response.json({ data: [{ model_name: 'gpt-image-2-c' }] })
+    }
+    return Response.json({
+      data: [{ url: 'https://media.example.com/actual.png' }],
+    })
+  })
+  render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
+  await connect()
+  expect(screen.getByRole('textbox', { name: 'Prompt' })).toHaveAttribute(
+    'maxLength',
+    '30000'
+  )
 })
 function generate() {
   fireEvent.change(screen.getByRole('textbox', { name: 'Prompt' }), {
@@ -214,10 +266,31 @@ it('exposes Seedance 2.5 text/image modes and documented video controls', async 
   ).toBeChecked()
 
   fireEvent.click(screen.getByRole('radio', { name: 'Image to video' }))
-  expect(screen.getByLabelText('Choose first-frame image')).toBeEnabled()
+  expect(screen.getByLabelText('Choose reference images')).toBeEnabled()
   expect(
     screen.getByRole('button', { name: 'Generate with LinoRoute' })
   ).toBeDisabled()
+})
+
+it('exposes multiple reference-image input for Kling Video 3.0 Omni', async () => {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+    if (String(url).endsWith('/v1/models')) {
+      return Response.json({ data: [{ id: 'kling-omni-video' }] })
+    }
+    if (String(url).endsWith('/api/pricing')) {
+      return Response.json({ data: [{ model_name: 'kling-omni-video' }] })
+    }
+    throw new Error('This controls-only check must not generate media')
+  })
+  render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
+  await connect()
+  fireEvent.click(screen.getByRole('button', { name: 'Videos' }))
+
+  const picker = screen.getByLabelText('Choose reference images')
+  expect(picker).toBeEnabled()
+  expect(picker).toHaveAttribute('multiple')
+  expect(picker).toHaveAttribute('accept', 'image/png,image/jpeg,image/webp')
+  expect(screen.getByText('0 / 4')).toBeInTheDocument()
 })
 
 it('uploads a local MiniMax H3 first frame to OSS before the paid video request', async () => {
@@ -283,7 +356,7 @@ it('uploads a local MiniMax H3 first frame to OSS before the paid video request'
   })
 })
 
-it('uploads a local Seedance first frame instead of asking for an HTTPS URL', async () => {
+it('uploads multiple local Seedance reference images instead of asking for HTTPS URLs', async () => {
   const calls: string[] = []
   let paidPayload: Record<string, unknown> | undefined
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
@@ -300,12 +373,11 @@ it('uploads a local Seedance first frame instead of asking for an HTTPS URL', as
     }
     if (target === '/studio-storage/v1/uploads') {
       calls.push('ticket')
+      const index = calls.filter((entry) => entry === 'ticket').length
       return Response.json({
-        uploadUrl:
-          'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/reference/seedance-frame.png?signature=put',
-        readUrl:
-          'https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/reference/seedance-frame.png?signature=get',
-        objectKey: 'studio/reference/seedance-frame.png',
+        uploadUrl: `https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/reference/seedance-frame-${index}.png?signature=put`,
+        readUrl: `https://linoroute.oss-cn-guangzhou.aliyuncs.com/studio/reference/seedance-frame-${index}.png?signature=get`,
+        objectKey: `studio/reference/seedance-frame-${index}.png`,
         expiresAt: Date.now() + 604_800_000,
       })
     }
@@ -327,13 +399,17 @@ it('uploads a local Seedance first frame instead of asking for an HTTPS URL', as
   expect(
     screen.queryByLabelText('First-frame image HTTPS URL (optional)')
   ).not.toBeInTheDocument()
-  const picker = screen.getByLabelText('Choose first-frame image')
+  const picker = screen.getByLabelText('Choose reference images')
   fireEvent.change(picker, {
     target: {
-      files: [new File([png], 'seedance-frame.png', { type: 'image/png' })],
+      files: [
+        new File([png], 'seedance-frame-1.png', { type: 'image/png' }),
+        new File([png], 'seedance-frame-2.png', { type: 'image/png' }),
+      ],
     },
   })
-  await screen.findByText('seedance-frame.png')
+  await screen.findByText('seedance-frame-1.png')
+  await screen.findByText('seedance-frame-2.png')
   fireEvent.change(screen.getByRole('textbox', { name: 'Prompt' }), {
     target: { value: 'Slow cinematic movement from the uploaded first frame' },
   })
@@ -342,14 +418,25 @@ it('uploads a local Seedance first frame instead of asking for an HTTPS URL', as
   )
   fireEvent.click(screen.getByRole('button', { name: 'Confirm and generate' }))
 
-  await waitFor(() => expect(calls).toEqual(['ticket', 'upload', 'paid']))
+  await waitFor(() =>
+    expect(calls).toEqual(['ticket', 'upload', 'ticket', 'upload', 'paid'])
+  )
   expect(paidPayload).toMatchObject({
     content: [
       { type: 'text' },
       {
         type: 'image_url',
-        image_url: { url: expect.stringContaining('signature=get') },
-        role: 'first_frame',
+        image_url: {
+          url: expect.stringContaining('seedance-frame-1.png?signature=get'),
+        },
+        role: 'reference_image',
+      },
+      {
+        type: 'image_url',
+        image_url: {
+          url: expect.stringContaining('seedance-frame-2.png?signature=get'),
+        },
+        role: 'reference_image',
       },
     ],
   })
@@ -422,9 +509,7 @@ it('does not send a paid request if the initial history record cannot be saved',
   generate()
   fireEvent.click(screen.getByRole('button', { name: 'Confirm and generate' }))
   await screen.findByText(/OSS upload or browser saving failed/)
-  expect(
-    transport.mock.calls.filter((c) => c[1]?.method === 'POST')
-  ).toHaveLength(0)
+  expect(paidPosts(transport)).toHaveLength(0)
 })
 
 it('keeps a paid result visible when final history saving fails and does not resubmit', async () => {
@@ -443,11 +528,12 @@ it('keeps a paid result visible when final history saving fails and does not res
   fireEvent.click(screen.getByRole('button', { name: 'Confirm and generate' }))
   expect(
     await screen.findByRole('img', { name: 'Generated image' })
-  ).toHaveAttribute('src', 'https://media.example.com/actual.png')
+  ).toHaveAttribute(
+    'src',
+    expect.stringContaining('studio/result/archived.png')
+  )
   await screen.findByText(/OSS upload or browser saving failed/)
-  expect(
-    transport.mock.calls.filter((c) => c[1]?.method === 'POST')
-  ).toHaveLength(1)
+  expect(paidPosts(transport)).toHaveLength(1)
 })
 it('requires paid confirmation, displays real output and never saves the key in generation history', async () => {
   const transport = mockRelay()
@@ -460,13 +546,14 @@ it('requires paid confirmation, displays real output and never saves the key in 
   expect(screen.getByRole('dialog')).toHaveTextContent(
     'Confirm paid generation'
   )
-  expect(
-    transport.mock.calls.filter((c) => c[1]?.method === 'POST')
-  ).toHaveLength(0)
+  expect(paidPosts(transport)).toHaveLength(0)
   fireEvent.click(screen.getByRole('button', { name: 'Confirm and generate' }))
   expect(
     await screen.findByRole('img', { name: 'Generated image' })
-  ).toHaveAttribute('src', 'https://media.example.com/actual.png')
+  ).toHaveAttribute(
+    'src',
+    expect.stringContaining('studio/result/archived.png')
+  )
   expect(JSON.stringify(save.mock.calls)).not.toContain(key)
   expect(save.mock.calls.at(-1)?.[0]).toMatchObject({
     live: true,
@@ -522,16 +609,14 @@ it('ambiguous generation never displays the perfume sample or automatically resu
     screen.queryByRole('img', { name: 'Generated image' })
   ).not.toBeInTheDocument()
   expect(screen.queryByText('Fixed sample')).not.toBeInTheDocument()
-  expect(
-    transport.mock.calls.filter((c) => c[1]?.method === 'POST')
-  ).toHaveLength(1)
+  expect(paidPosts(transport)).toHaveLength(1)
 })
 it('disconnect returns to key setup without demo claims and removes the live session', async () => {
   mockRelay()
   render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
   await connect()
   fireEvent.click(screen.getByRole('button', { name: 'API connected' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Disconnect API key' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Clear saved API key' }))
   expect(screen.queryByText('Demo mode · No charges')).not.toBeInTheDocument()
   expect(
     await screen.findByRole('button', { name: 'Connect key to generate' })
@@ -539,6 +624,19 @@ it('disconnect returns to key setup without demo claims and removes the live ses
   expect(
     screen.getByRole('button', { name: 'Configure API key' })
   ).toBeVisible()
+})
+it('shows only a masked saved key and clears it from browser storage', async () => {
+  mockRelay()
+  render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
+  await connect()
+
+  fireEvent.click(screen.getByRole('button', { name: 'API connected' }))
+  expect(screen.getByText('••••••••')).toBeVisible()
+  expect(screen.getByRole('dialog')).not.toHaveTextContent(key)
+  fireEvent.click(screen.getByRole('button', { name: 'Clear saved API key' }))
+
+  expect(localStorage.getItem('linoroute-studio:live-api-key:v1')).toBeNull()
+  expect(screen.getByRole('button', { name: 'Configure API key' })).toBeVisible()
 })
 it('restores a connected API key after remounting in the same browser tab', async () => {
   mockRelay()
@@ -560,7 +658,7 @@ it('does not restore an API key after the user disconnects it', async () => {
   )
   await connect()
   fireEvent.click(screen.getByRole('button', { name: 'API connected' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Disconnect API key' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Clear saved API key' }))
 
   firstView.unmount()
   render(<StudioPreviewApp store={createMemoryStore()} locale='en' />)
@@ -600,16 +698,13 @@ it('resume checks an existing video task without submitting a second paid reques
   await store.put(job)
   fireEvent.click(screen.getByRole('button', { name: 'My works' }))
   fireEvent.click(await screen.findByRole('button', { name: 'Open task' }))
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'Resume status check' })
+  await waitFor(
+    () =>
+      expect(save.mock.calls.at(-1)?.[0]).toMatchObject({
+        stage: 'ready',
+        taskId: 'cgt-1',
+      }),
+    { timeout: 7_000 }
   )
-  await waitFor(() =>
-    expect(save.mock.calls.at(-1)?.[0]).toMatchObject({
-      stage: 'ready',
-      taskId: 'cgt-1',
-    })
-  )
-  expect(
-    transport.mock.calls.filter((c) => c[1]?.method === 'POST')
-  ).toHaveLength(0)
+  expect(paidPosts(transport)).toHaveLength(0)
 })

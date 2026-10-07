@@ -488,6 +488,26 @@
   font-size: 12px;
   line-height: 1.65;
 }
+.studio-saved-key {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #d9e5f8;
+  border-radius: 11px;
+  color: #50627c;
+  font-size: 13px;
+}
+.studio-saved-key code {
+  margin-right: auto;
+  color: #17365f;
+  letter-spacing: 2px;
+}
+.studio-saved-key button {
+  width: 100%;
+}
 .studio-live-key-form a,
 .lr-studio .studio-live-workspace a {
   color: #2459d3;

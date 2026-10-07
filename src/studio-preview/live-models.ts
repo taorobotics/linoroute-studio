@@ -59,7 +59,8 @@ export const LIVE_MODELS: LiveModel[] = [
     kind: 'video',
     protocol: 'seedance',
     ratios: ['16:9', '9:16', '1:1'],
-    durations: [5, 8, 10],
+    durations: Array.from({ length: 12 }, (_, index) => index + 4),
+    defaultDuration: 5,
   },
   {
     id: 'doubao-seedance-2-0-fast-260128',
@@ -67,7 +68,8 @@ export const LIVE_MODELS: LiveModel[] = [
     kind: 'video',
     protocol: 'seedance',
     ratios: ['16:9', '9:16', '1:1'],
-    durations: [5, 8, 10],
+    durations: Array.from({ length: 12 }, (_, index) => index + 4),
+    defaultDuration: 5,
   },
   {
     id: 'kling-video',

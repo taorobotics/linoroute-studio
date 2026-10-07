@@ -37,6 +37,10 @@ export const GPT25_PER_REQUEST_IDS = [
   'gpt-image-2.5-flare-c',
   'gpt-image-2.5-sunburst-c',
 ]
+
+// Studio's local editor ceiling. The upstream model or gateway may still
+// enforce a shorter limit; prompts are never silently truncated by Studio.
+export const STUDIO_PROMPT_INPUT_LIMIT = 30_000
 // Real generation probes, 2026-09-13: both -c variants accepted these wide/tall
 // sizes but returned different pixel dimensions. Do not advertise exact 2K/4K.
 const GPT25_PER_REQUEST_OUTPUTS: ImageOutputOption[] = [
@@ -168,9 +172,6 @@ export function supportsImageEditing(model?: LiveModel): boolean {
   )
 }
 
-export function imagePromptLimit(model?: LiveModel): number {
-  return model &&
-    (model.id === 'gpt-image-2' || GPT25_DOCUMENTED_IDS.includes(model.id))
-    ? 1000
-    : 2500
+export function imagePromptLimit(_model?: LiveModel): number {
+  return STUDIO_PROMPT_INPUT_LIMIT
 }

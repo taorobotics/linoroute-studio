@@ -89,8 +89,9 @@ it.each(['zh', 'en'] as const)(
       'Seedance 2.0',
       'Seedance 2.0 Fast',
       'Kling Video 3.0',
+      'Kling Video 3.0 Omni',
       'Veo 3.1',
-      'Gemini Omni',
+      'Veo 3.1 Fast',
       'Grok Imagine Video',
     ]) {
       await user.click(picker)
