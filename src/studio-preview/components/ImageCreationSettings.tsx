@@ -79,7 +79,7 @@ export function ImageOutputSettings(props: {
   const mode = props.mode ?? 'text'
   const options = imageOutputOptions(props.model, mode)
   const ratios = [...new Set(options.map((entry) => entry.ratio))]
-  const nativeResolution = props.model.id === 'gemini-3-pro-image-preview'
+  const nativeResolution = props.model.protocol === 'gemini-image'
   const approximateSize = GPT25_PER_REQUEST_IDS.includes(props.model.id)
   const sizes = options.filter((entry) => entry.ratio === props.ratio)
   const experimental = sizes.find(
@@ -217,7 +217,7 @@ export function ImageOutputSettings(props: {
           )}
         </p>
       )}
-      {props.model.id === 'gemini-3-pro-image-preview' && (
+      {nativeResolution && (
         <p className='studio-reference-note'>
           {t(
             'Resolution and aspect ratio are independent. At 1:1, 1K / 2K / 4K correspond to 1024 / 2048 / 4096 pixels per side. Other ratios have different dimensions.'

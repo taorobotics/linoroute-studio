@@ -131,6 +131,7 @@ export function ReferenceImageInput(props: {
   label?: string
   inputLabel?: string
   maxFiles?: number
+  maxTotalBytes?: number
   allowMask?: boolean
   mask?: File
   onMaskChange?: (file?: File) => void
@@ -153,6 +154,16 @@ export function ReferenceImageInput(props: {
   )
   const addFiles = async (selected: File[]) => {
     if (locked || !selected.length) return
+    if (
+      props.maxTotalBytes &&
+      [...props.files, ...selected].reduce(
+        (total, file) => total + file.size,
+        0
+      ) > props.maxTotalBytes
+    ) {
+      setIssue('Reference images must be no larger than 20 MB combined.')
+      return
+    }
     if (
       props.files.length + selected.length > maxFiles ||
       selected.some(

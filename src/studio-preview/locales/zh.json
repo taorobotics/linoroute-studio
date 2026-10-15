@@ -56,6 +56,7 @@
   "Click, drop or paste images here": "点击上传、拖入，或在此粘贴图片",
   "Choose up to 4 PNG, JPEG or WebP images, no larger than 5 MB each.": "最多选择 4 张 PNG、JPEG 或 WebP 图片，每张不超过 5 MB。",
   "Choose up to {{count}} PNG, JPEG or WebP images, no larger than 5 MB each.": "最多选择 {{count}} 张 PNG、JPEG 或 WebP 图片，每张不超过 5 MB。",
+  "Reference images must be no larger than 20 MB combined.": "参考图片总大小不能超过 20 MB。",
   "Up to {{count}} PNG, JPEG or WebP images, 5 MB each. Sent only after confirmation.": "最多 {{count}} 张 PNG、JPEG 或 WebP 图片，每张不超过 5 MB；确认生成后才会发送。",
   "Mask image (optional)": "蒙版图片（选填）",
   "Mask image": "蒙版图片",

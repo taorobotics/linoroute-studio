@@ -12,6 +12,7 @@ import { createMemoryStore } from '../memory-store'
 
 it.each([
   { label: 'Nano Banana Pro', logo: '/landing/model-logos/gemini.svg' },
+  { label: 'Nano Banana 2.1', logo: '/landing/model-logos/gemini.svg' },
   { label: 'GPT-image-2.5', logo: '/landing/model-logos/chatgpt.svg' },
 ])(
   'keeps $label selected with its logo and draft after switching workspaces',

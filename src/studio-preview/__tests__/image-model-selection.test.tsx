@@ -51,7 +51,10 @@ function relay(available = ids, result?: Promise<Response>) {
       )
     }
     if (init?.method === 'POST' && String(url).startsWith('/studio-storage/')) {
-      return Response.json({ error: 'Archive unavailable in this test' }, { status: 503 })
+      return Response.json(
+        { error: 'Archive unavailable in this test' },
+        { status: 503 }
+      )
     }
     throw new Error('Unexpected request')
   })

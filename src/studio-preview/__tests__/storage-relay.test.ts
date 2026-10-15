@@ -41,15 +41,18 @@ it.each([
   ],
   ['POST', '/studio-storage/other', 'http://127.0.0.1:4178', 404],
   ['POST', '/studio-storage/v1/uploads', 'https://evil.test', 403],
-])('rejects unsafe signer relay request %s %s', async (method, path, origin, expected) => {
-  const transport = vi.fn()
-  const response = await relayStorageRequest(
-    new Request(`http://127.0.0.1:4178${path}`, {
-      method,
-      headers: { Authorization: 'Bearer sk-test', Origin: origin },
-    }),
-    transport
-  )
-  expect(response.status).toBe(expected)
-  expect(transport).not.toHaveBeenCalled()
-})
+])(
+  'rejects unsafe signer relay request %s %s',
+  async (method, path, origin, expected) => {
+    const transport = vi.fn()
+    const response = await relayStorageRequest(
+      new Request(`http://127.0.0.1:4178${path}`, {
+        method,
+        headers: { Authorization: 'Bearer sk-test', Origin: origin },
+      }),
+      transport
+    )
+    expect(response.status).toBe(expected)
+    expect(transport).not.toHaveBeenCalled()
+  }
+)

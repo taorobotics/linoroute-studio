@@ -2,6 +2,10 @@
 SPDX-License-Identifier: AGPL-3.0-or-later */
 import { expect, it, vi } from 'vitest'
 
+import {
+  imageReferenceLimit,
+  MAX_GEMINI_REFERENCE_TOTAL_BYTES,
+} from '../image-output-specs'
 import { submitLive } from '../live-client'
 import { LIVE_MODELS } from '../live-models'
 
@@ -56,6 +60,86 @@ it.each(['1K', '2K', '4K'])(
     }
   }
 )
+
+it.each(['1K', '2K', '4K'])(
+  'Nano Banana 2.1 sends %s through the native Gemini endpoint for text and image creation',
+  async (size) => {
+    for (const mode of ['text', 'image'] as const) {
+      const transport = vi.fn(async () =>
+        Response.json({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    inlineData: { mimeType: 'image/png', data: 'Zml4dHVyZQ==' },
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      )
+      await submitLive(
+        'sk-test',
+        model('gemini-nano-banana-2.1'),
+        { ...base, ratio: '21:9', size, mode, images: [file] },
+        new AbortController().signal,
+        transport
+      )
+      const calls = transport.mock.calls as unknown as [string, RequestInit][]
+      expect(calls).toHaveLength(1)
+      expect(calls[0][0]).toBe(
+        '/studio-api/v1beta/models/gemini-nano-banana-2.1:generateContent'
+      )
+      const body = JSON.parse(String(calls[0][1].body))
+      expect(body.generationConfig.imageConfig).toEqual({
+        aspectRatio: '21:9',
+        imageSize: size,
+      })
+      expect(body.contents[0].parts).toHaveLength(mode === 'image' ? 2 : 1)
+    }
+  }
+)
+
+it('Nano Banana 2.1 rejects unsupported 512-pixel output before a billed request', async () => {
+  const transport = vi.fn(async () => reply())
+  await expect(
+    submitLive(
+      'sk-test',
+      model('gemini-nano-banana-2.1'),
+      { ...base, size: '512' },
+      new AbortController().signal,
+      transport
+    )
+  ).rejects.toMatchObject({ code: 'invalid_parameters' })
+  expect(transport).not.toHaveBeenCalled()
+})
+
+it('Nano Banana 2.1 accepts up to 14 references, but rejects a request above the relay body budget', async () => {
+  const chosen = model('gemini-nano-banana-2.1')
+  expect(imageReferenceLimit(chosen)).toBe(14)
+  const oversized = Array.from({ length: 5 }, (_, index) => {
+    const reference = new File(['x'], `reference-${index}.png`, {
+      type: 'image/png',
+    })
+    Object.defineProperty(reference, 'size', {
+      value: MAX_GEMINI_REFERENCE_TOTAL_BYTES / 4,
+    })
+    return reference
+  })
+  const transport = vi.fn(async () => reply())
+  await expect(
+    submitLive(
+      'sk-test',
+      chosen,
+      { ...base, mode: 'image', images: oversized },
+      new AbortController().signal,
+      transport
+    )
+  ).rejects.toMatchObject({ code: 'invalid_parameters' })
+  expect(transport).not.toHaveBeenCalled()
+})
 
 it.each(['8K', '512', '2048x2048'])(
   'Nano Banana Pro rejects unsupported resolution %s before a paid call',

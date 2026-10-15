@@ -6,6 +6,7 @@ const POST_PATHS = new Set([
   '/v1/images/generations',
   '/v1/images/edits',
   '/v1beta/models/gemini-3-pro-image-preview:generateContent',
+  '/v1beta/models/gemini-nano-banana-2.1:generateContent',
   '/api/v3/contents/generations/tasks',
   '/kling/v1/videos/text2video',
   '/kling/v1/videos/image2video',

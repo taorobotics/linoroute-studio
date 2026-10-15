@@ -6,7 +6,7 @@ import {
 } from './image-output-specs'
 import type { LiveModel } from './live-types'
 
-// IDs and protocols checked against LinoRoute pricing and Ninoroute docs 2026-09-15.
+// IDs and protocols checked against LinoRoute pricing and provider docs.
 // The authenticated model list still decides what this particular key may select.
 export const LIVE_MODELS: LiveModel[] = [
   ...[
@@ -43,6 +43,28 @@ export const LIVE_MODELS: LiveModel[] = [
     kind: 'image',
     protocol: 'gemini-image',
     ratios: ['1:1', '3:2', '16:9', '9:16'],
+  },
+  {
+    id: 'gemini-nano-banana-2.1',
+    label: 'Nano Banana 2.1',
+    kind: 'image',
+    protocol: 'gemini-image',
+    ratios: [
+      '1:1',
+      '3:2',
+      '2:3',
+      '16:9',
+      '9:16',
+      '4:3',
+      '3:4',
+      '5:4',
+      '4:5',
+      '21:9',
+      '4:1',
+      '1:4',
+      '8:1',
+      '1:8',
+    ],
   },
   {
     id: 'doubao-seedance-2-5-260628',

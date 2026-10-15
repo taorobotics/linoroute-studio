@@ -21,10 +21,12 @@ it('ships hundreds of traceable image prompt cases without broken metadata', asy
   }
 
   expect(
-    imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2.5')).length
+    imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2.5'))
+      .length
   ).toBeGreaterThanOrEqual(180)
   expect(
-    imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2')).length
+    imagePromptCatalog.filter((item) => item.models.includes('GPT Image 2'))
+      .length
   ).toBeGreaterThanOrEqual(180)
   expect(
     imagePromptCatalog.filter((item) => item.models.includes('Nano Banana Pro'))

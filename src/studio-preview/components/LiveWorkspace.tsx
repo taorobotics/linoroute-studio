@@ -13,6 +13,7 @@ import {
 } from '../gpt-image-selection'
 import {
   GPT25_PER_REQUEST_IDS,
+  MAX_GEMINI_REFERENCE_TOTAL_BYTES,
   imageOutputOptions,
   imagePromptLimit,
   imageReferenceLimit,
@@ -558,6 +559,11 @@ export function LiveWorkspace(props: {
                       setMask(undefined)
                     }}
                     maxFiles={imageReferenceLimit(model)}
+                    maxTotalBytes={
+                      model?.protocol === 'gemini-image'
+                        ? MAX_GEMINI_REFERENCE_TOTAL_BYTES
+                        : undefined
+                    }
                     allowMask={supportsImageMask(model)}
                     mask={mask}
                     onMaskChange={setMask}

@@ -61,6 +61,30 @@ it('Nano Banana Pro exposes three native resolution tiers and keeps its default 
   expect(onChange).toHaveBeenCalledWith('1:1', '4K')
 })
 
+it('Nano Banana 2.1 offers its native 1K/2K/4K sizes and wide aspect ratios', () => {
+  const onChange = vi.fn()
+  const model = fixtureModel('gemini-nano-banana-2.1')
+  render(
+    <I18nextProvider i18n={createStudioI18n('en')}>
+      <ImageOutputSettings
+        model={model}
+        ratio='1:1'
+        size='1K'
+        disabled={false}
+        onChange={onChange}
+      />
+    </I18nextProvider>
+  )
+  expect(screen.getByRole('radio', { name: '1K' })).toBeChecked()
+  expect(screen.getByRole('radio', { name: '2K' })).toBeEnabled()
+  expect(screen.getByRole('radio', { name: '4K' })).toBeEnabled()
+  expect(screen.getAllByRole('button', { name: /:/ })).toHaveLength(14)
+  fireEvent.click(screen.getByRole('radio', { name: '4K' }))
+  expect(onChange).toHaveBeenLastCalledWith('1:1', '4K')
+  fireEvent.click(screen.getByRole('button', { name: '21:9' }))
+  expect(onChange).toHaveBeenLastCalledWith('21:9', '1K')
+})
+
 it('GPT 2.5 per-request never advertises a true 2K or 4K tier', () => {
   const model = fixtureModel('gpt-image-2.5-flare-c')
   render(

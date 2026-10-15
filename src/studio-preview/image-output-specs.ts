@@ -41,6 +41,9 @@ export const GPT25_PER_REQUEST_IDS = [
 // Studio's local editor ceiling. The upstream model or gateway may still
 // enforce a shorter limit; prompts are never silently truncated by Studio.
 export const STUDIO_PROMPT_INPUT_LIMIT = 30_000
+// Gemini sends images inline as base64. Stay below both the local relay and
+// production Nginx 30 MB request limits after JSON/base64 expansion.
+export const MAX_GEMINI_REFERENCE_TOTAL_BYTES = 20 * 1024 * 1024
 // Real generation probes, 2026-09-13: both -c variants accepted these wide/tall
 // sizes but returned different pixel dimensions. Do not advertise exact 2K/4K.
 const GPT25_PER_REQUEST_OUTPUTS: ImageOutputOption[] = [
@@ -103,7 +106,7 @@ export function imageOutputOptions(
   mode: ImageGenerationMode = 'text'
 ): ImageOutputOption[] {
   if (!model) return []
-  if (model.id === 'gemini-3-pro-image-preview') {
+  if (model.protocol === 'gemini-image') {
     return model.ratios.flatMap((ratio) =>
       ['1K', '2K', '4K'].map((size) => ({ ratio, size }))
     )
@@ -154,6 +157,7 @@ export function imageRequestOptions(
 }
 
 export function imageReferenceLimit(model?: LiveModel): number {
+  if (model?.id === 'gemini-nano-banana-2.1') return 14
   return model && GPT25_DOCUMENTED_IDS.includes(model.id) ? 16 : 4
 }
 
@@ -164,11 +168,8 @@ export function supportsImageMask(model?: LiveModel): boolean {
 export function supportsImageEditing(model?: LiveModel): boolean {
   return (
     !!model &&
-    [
-      ...GPT25_DOCUMENTED_IDS,
-      'gpt-image-2',
-      'gemini-3-pro-image-preview',
-    ].includes(model.id)
+    (model.protocol === 'gemini-image' ||
+      [...GPT25_DOCUMENTED_IDS, 'gpt-image-2'].includes(model.id))
   )
 }
 

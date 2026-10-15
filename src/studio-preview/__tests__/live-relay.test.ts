@@ -50,3 +50,26 @@ it('forwards to fixed LinoRoute origin with no cookies, redirects or key in URL'
   expect(await response.json()).toEqual({ data: [] })
   expect(response.headers.get('Cache-Control')).toBe('no-store')
 })
+
+it('allows only the Nano Banana 2.1 native generation route with a same-origin key', async () => {
+  const upstream = vi.fn(async (url) => {
+    expect(url).toBe(
+      'https://linoroute.com/v1beta/models/gemini-nano-banana-2.1:generateContent'
+    )
+    return Response.json({ candidates: [] })
+  })
+  const response = await relayRequest(
+    request('/v1beta/models/gemini-nano-banana-2.1:generateContent', {
+      method: 'POST',
+      headers: {
+        Origin: 'http://127.0.0.1:4178',
+        Authorization: 'Bearer sk-test',
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    }),
+    upstream
+  )
+  expect(response.status).toBe(200)
+  expect(upstream).toHaveBeenCalledTimes(1)
+})

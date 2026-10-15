@@ -1,5 +1,6 @@
 import {
   GPT25_DOCUMENTED_IDS,
+  MAX_GEMINI_REFERENCE_TOTAL_BYTES,
   imageOutputOptions,
   imagePromptLimit,
   imageReferenceLimit,
@@ -179,11 +180,10 @@ export async function submitLive(
     (draft.images?.length || draft.referenceUrl || draft.referenceUrls?.length
       ? 'image'
       : 'text')
-  const referenceUrls = draft.referenceUrls?.length
-    ? draft.referenceUrls
-    : draft.referenceUrl
-      ? [draft.referenceUrl]
-      : []
+  let referenceUrls = draft.referenceUrls ?? []
+  if (!referenceUrls.length && draft.referenceUrl) {
+    referenceUrls = [draft.referenceUrl]
+  }
   const ratio = draft.ratio
   if (
     !draft.prompt.trim() ||
@@ -222,6 +222,9 @@ export async function submitLive(
         f.size > 5 * 1024 * 1024 ||
         !f.size
     ) ||
+    (model.protocol === 'gemini-image' &&
+      images.reduce((total, image) => total + image.size, 0) >
+        MAX_GEMINI_REFERENCE_TOTAL_BYTES) ||
     (mask &&
       (!supportsImageMask(model) ||
         mask.type !== 'image/png' ||

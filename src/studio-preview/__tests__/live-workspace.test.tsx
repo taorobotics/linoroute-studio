@@ -636,7 +636,9 @@ it('shows only a masked saved key and clears it from browser storage', async () 
   fireEvent.click(screen.getByRole('button', { name: 'Clear saved API key' }))
 
   expect(localStorage.getItem('linoroute-studio:live-api-key:v1')).toBeNull()
-  expect(screen.getByRole('button', { name: 'Configure API key' })).toBeVisible()
+  expect(
+    screen.getByRole('button', { name: 'Configure API key' })
+  ).toBeVisible()
 })
 it('restores a connected API key after remounting in the same browser tab', async () => {
   mockRelay()

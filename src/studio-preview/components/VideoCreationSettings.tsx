@@ -4,7 +4,7 @@ import { Image, Type, Volume2 } from 'lucide-react'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { type VideoResolution } from '../video-output-specs'
+import type { VideoResolution } from '../video-output-specs'
 
 export function VideoGenerationMode(props: {
   mode: 'text' | 'image'

@@ -13,6 +13,7 @@ const file = (name = 'ref.png') => new File([png], name, { type: 'image/png' })
 function Harness(props: {
   disabled?: boolean
   maxFiles?: number
+  maxTotalBytes?: number
   allowMask?: boolean
 }) {
   const [files, setFiles] = useState<File[]>([])
@@ -23,6 +24,7 @@ function Harness(props: {
     disabled: Boolean(props.disabled),
     onBusyChange: () => undefined,
     maxFiles: props.maxFiles,
+    maxTotalBytes: props.maxTotalBytes,
     allowMask: props.allowMask,
     mask,
     onMaskChange: setMask,
@@ -150,4 +152,19 @@ it('supports the GPT Image 2.5 limit and an optional same-size PNG mask', async 
   expect(
     await screen.findByRole('button', { name: 'Remove mask.png' })
   ).toBeEnabled()
+})
+
+it('shows a local error when Gemini reference images exceed the combined upload budget', async () => {
+  decoder()
+  render(<Harness maxFiles={14} maxTotalBytes={20 * 1024 * 1024} />)
+  const references = Array.from({ length: 5 }, (_, index) => {
+    const reference = file(`reference-${index}.png`)
+    Object.defineProperty(reference, 'size', { value: 5 * 1024 * 1024 })
+    return reference
+  })
+  fireEvent.change(screen.getByLabelText('Add reference images'), {
+    target: { files: references },
+  })
+  expect(await screen.findByRole('alert')).toHaveTextContent('20 MB combined')
+  expect(screen.queryByRole('img')).not.toBeInTheDocument()
 })
