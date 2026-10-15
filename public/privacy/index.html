@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LinoRoute 主站与 Studio 创作工作台的隐私政策：了解账号、API Key、提示词、上传素材、浏览器历史和 OSS 文件如何处理。">
+  <link rel="canonical" href="https://studio.linoroute.com/privacy/">
+  <link rel="icon" href="/landing/lino-mark-v2.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/legal.css">
+  <title>隐私政策 | LinoRoute &amp; Studio</title>
+</head>
+<body>
+  <header class="legal-header">
+    <a class="legal-brand" href="https://linoroute.com/"><img src="/landing/lino-mark-v2.svg" alt="">LinoRoute</a>
+    <nav aria-label="页面导航"><a href="https://linoroute.com/">主站</a><a href="/">Studio</a><a href="/privacy/" aria-current="page">隐私政策</a><a href="/terms/">服务条款</a></nav>
+  </header>
+  <main class="legal-wrap">
+    <div class="legal-hero">
+      <p class="legal-kicker">LinoRoute · Legal</p>
+      <h1>隐私政策</h1>
+      <p class="legal-meta">适用于 LinoRoute 主站及 Studio 分站 · 生效及更新日期：2026 年 10 月 15 日</p>
+      <p class="legal-intro">我们希望您能清楚了解：使用主站账号与 API 时、在 Studio 生成图片或视频时，以及把素材上传到 OSS 时，哪些信息会留在浏览器、哪些会发送到服务端或第三方。</p>
+      <nav class="legal-language" aria-label="语言"><a href="#zh">简体中文</a><a href="#en">English</a></nav>
+    </div>
+    <article class="legal-card" id="zh" lang="zh-CN">
+      <h2>中文版</h2>
+      <h3>1. 适用范围与联系</h3>
+      <p>本政策适用于 LinoRoute 主站（<a href="https://linoroute.com/">linoroute.com</a>）及 LinoRoute Studio（<a href="https://studio.linoroute.com/">studio.linoroute.com</a>），下称“我们”或“服务”。Studio 是使用 LinoRoute API 的图片、视频创作界面；主站负责账号、API Key、模型访问和计费。有关本政策、数据请求或投诉，请联系 <a href="mailto:service@linoroute.com">service@linoroute.com</a>。</p>
+      <h3>2. 我们处理哪些信息</h3>
+      <ul>
+        <li><strong>主站账号与交易：</strong>您注册或使用主站时提供的账号名、邮箱、登录凭据，以及在适用时的余额、充值、订单、发票和客服记录，用于登录、账户管理、结算和处理咨询。具体字段以您实际使用的功能及页面为准。</li>
+        <li><strong>API 使用：</strong>API Key 或其关联标识、所选模型、调用时间、用量、费用、状态及必要的安全/故障信息，用于鉴权、计费、排障和防滥用。调用内容可能包括您提交的提示词、图片、视频或其他参考素材。</li>
+        <li><strong>Studio 浏览器数据：</strong>您输入的 LinoRoute API Key 默认保存在当前浏览器的 localStorage，以便刷新后重新连接；创作任务、提示词、作品记录和本地素材主要保存在当前浏览器的 IndexedDB。Studio 不提供跨设备自动同步这些本地历史的功能；浏览器清理、无痕模式或设备更换可能使其无法恢复。断开 API 连接会清除已记住的 Key，不等于删除浏览器中的作品历史。</li>
+        <li><strong>Studio 上传与结果：</strong>当您选择参考素材或生成结果时，相关文件可上传至我们使用的私有阿里云 OSS 存储，并通过有时效的签名链接供模型处理或您查看。Studio 的 OSS 长期访问凭据只部署在服务端，不会放入网页前端。公开提示词库的展示素材使用与用户临时上传不同的存储区域。</li>
+        <li><strong>技术信息：</strong>为提供服务和保障安全，我们或基础设施服务商可能处理 IP 地址、设备/浏览器信息、访问时间、错误状态等必要技术信息。Studio 的浏览器本地存储不是 Cookie；主站的登录或支付流程可能使用 Cookie 或类似技术，具体取决于您实际访问的功能。</li>
+      </ul>
+      <h3>3. 使用目的与处理依据</h3>
+      <p>我们仅为提供账号与 API 服务、完成您发起的创作请求、计算费用、保障系统安全、处理售后及履行适用法律义务而处理上述信息。需要额外授权的处理活动，我们会在适用时另行提示或取得同意。请勿在提示词和素材中提交您无权使用的个人信息、机密或敏感内容。</p>
+      <h3>4. 信息会流向哪里</h3>
+      <p>Studio 发起真实生成时，会把完成请求所需的 API Key、提示词、参数和素材通过 Studio 的服务端转发至 LinoRoute API；LinoRoute 再按您选择的模型/渠道向相应模型服务提供方发送必要内容。所选模型可能由不同服务商提供，其数据处理和输出规则可能不同。文件存储使用阿里云 OSS；支付、登录、邮件或云基础设施功能如被启用，也可能由相应第三方提供。我们不会因为您打开 Studio 页面就自动把本地作品历史公开发布到提示词库。</p>
+      <p>如主站启用 Google 等第三方登录，我们仅按您在授权页面同意的范围接收登录所需资料（通常为账号标识、邮箱及公开资料），用于创建或关联账号和登录；不会把 Google 登录资料用于广告投放。您可以在相应第三方的账户设置中撤销授权。实际授权范围以授权页面为准。</p>
+      <h3>5. 保存时间与您的控制</h3>
+      <p>主站账号、交易和 API 使用记录会按提供服务、争议处理及适用法律要求所需的期限保存。Studio 的 API Key 和本地历史保存在您的浏览器中，直至您主动清除、浏览器清理或存储不可用。临时 OSS 文件的<strong>读取链接通常在 7 天后失效</strong>；链接失效不等于 OSS 对象届时必定已物理删除，实际删除还取决于独立配置的存储生命周期规则。模型提供方的保存期限以其适用政策为准。重要作品请及时自行下载备份。</p>
+      <h3>6. 您的权利</h3>
+      <p>您可以在浏览器设置中删除 Studio 的本地存储，并在 Studio 中断开 API Key；也可通过上述邮箱提出访问、更正、删除账号相关个人信息或撤回适用同意的请求。我们可能先核验身份，并在法律允许或要求的范围内处理请求；删除请求不一定能立即移除依法必须保存的交易记录或已由第三方独立处理的数据。</p>
+      <h3>7. 安全、跨境与未成年人</h3>
+      <p>我们采用 HTTPS、访问控制及服务端凭据管理等措施降低风险，但任何网络服务都不能保证绝对安全。浏览器扩展、共用设备及设备丢失可能影响本地 API Key 和作品安全，请妥善保护设备与账户。由于模型提供方和基础设施可能位于不同地区，数据可能在提供服务所必需的范围内跨境处理；我们会遵守适用的告知和授权要求。本服务不面向未达到适用法律规定年龄的未成年人独立使用，监护人应在需要时提供指导和同意。</p>
+      <h3>8. 更新</h3>
+      <p>我们可能随功能、法律要求或服务商变化更新本政策，并在本页面标明新日期。重大变化会在合理可行的范围内通过站内提示或其他适当方式告知。继续使用服务前，请定期查看本页面。相关使用规则见<a href="/terms/">服务条款</a>。</p>
+    </article>
+    <article class="legal-card" id="en" lang="en">
+      <h2>English version</h2>
+      <h3>1. Scope and contact</h3>
+      <p>This policy covers the LinoRoute main site (<a href="https://linoroute.com/">linoroute.com</a>) and LinoRoute Studio (<a href="https://studio.linoroute.com/">studio.linoroute.com</a>). Studio is an image and video creation interface using the LinoRoute API. The main site handles accounts, API keys, model access and billing. For privacy requests or complaints, contact <a href="mailto:service@linoroute.com">service@linoroute.com</a>. Effective and last updated: October 15, 2026.</p>
+      <h3>2. Information we process</h3>
+      <ul>
+        <li><strong>Main-site accounts and transactions:</strong> account name, email, login credentials and, where applicable, balances, top-ups, orders, invoices and support messages, to manage accounts, billing and support. The fields depend on the features you use.</li>
+        <li><strong>API usage:</strong> API key or associated identifiers, selected model, time, usage, charges, status and necessary security/error information for authentication, billing, troubleshooting and abuse prevention. Request content can include prompts, images, videos and other references you submit.</li>
+        <li><strong>Studio browser data:</strong> your LinoRoute API key is normally kept in this browser's localStorage so it can reconnect after a refresh. Tasks, prompts, work history and local assets are primarily stored in this browser's IndexedDB. This local history does not automatically sync across devices and may be lost if browser data is cleared. Disconnecting the API removes the remembered key, not necessarily the local history.</li>
+        <li><strong>Studio uploads and output:</strong> selected reference media and results may be stored in a private Alibaba Cloud OSS bucket and accessed through time-limited signed links. Long-lived OSS credentials stay on the server, not in the web frontend. Public prompt-library previews use separate storage from temporary user uploads.</li>
+        <li><strong>Technical data:</strong> we or infrastructure providers may process IP address, device/browser information, access times and error status where necessary for service and security. Studio local storage is not a cookie; main-site login or payment functions may use cookies or similar technology.</li>
+      </ul>
+      <h3>3. Purposes and basis</h3>
+      <p>We process information to run accounts and APIs, fulfill creation requests, calculate charges, secure the service, provide support and meet applicable legal duties. Where additional permission is required, we will request it as appropriate. Do not submit personal, confidential or sensitive material you are not authorized to use.</p>
+      <h3>4. Recipients and third parties</h3>
+      <p>For a real generation request, Studio forwards the API key and necessary prompts, settings and media through its server to the LinoRoute API. LinoRoute then routes the needed content to the provider of the model/channel you selected. Provider data practices and output rules can vary. We use Alibaba Cloud OSS for files and may use other providers for enabled payment, sign-in, email or hosting functions. Merely opening Studio does not publish your local work history into the public prompt library.</p>
+      <p>If third-party sign-in such as Google is enabled on the main site, we receive only the information authorized on that sign-in screen (typically an account identifier, email and public profile) to create or link an account and sign you in. We do not use Google sign-in data for advertising. You may revoke access in the provider's account settings. The authorization screen controls the actual scope.</p>
+      <h3>5. Retention and your control</h3>
+      <p>Main-site account, transaction and API records are kept as needed for service, disputes and applicable law. Studio's local key and history remain in your browser until removed or cleared. <strong>Temporary OSS read links normally expire after seven days</strong>; expiry of a link does not mean the underlying object is physically deleted on that day. Object deletion depends on separately configured storage lifecycle rules. Model providers have their own retention policies. Download and back up important work promptly.</p>
+      <h3>6. Your rights</h3>
+      <p>You can clear Studio browser storage, disconnect its API key, or contact us to request access, correction, deletion or withdrawal of applicable consent for account-related personal data. We may verify your identity and handle requests subject to legal requirements. Mandatory transaction records or data independently processed by third parties may not be immediately removable.</p>
+      <h3>7. Security, international processing and minors</h3>
+      <p>We use HTTPS, access controls and server-side credential management, but no online service is completely secure. Extensions, shared devices and lost devices may expose browser-stored keys and work. Model providers or infrastructure may be in different regions; we will follow applicable notice and authorization requirements for necessary international processing. Minors below the age required by applicable law should not use the service independently; guardians should guide or consent where required.</p>
+      <h3>8. Changes</h3>
+      <p>We may update this policy as features, law or providers change and will post the new date here. Material changes will be communicated through reasonable means where practicable. Please review it periodically. See our <a href="/terms/">Terms of Service</a>.</p>
+    </article>
+  </main>
+  <footer class="legal-footer"><span>© 2026 LinoRoute</span><nav aria-label="法律信息"><a href="/privacy/">隐私政策 · Privacy</a><a href="/terms/">服务条款 · Terms</a><a href="mailto:service@linoroute.com">联系我们 · Contact</a></nav></footer>
+</body>
+</html>

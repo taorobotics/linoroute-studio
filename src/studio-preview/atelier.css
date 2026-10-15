@@ -180,6 +180,28 @@ UI-4: the selected image-1 studio direction. Scoped to the isolated preview. */
 .lr-studio .studio-layout {
   min-height: calc(100dvh - var(--studio-header-height));
 }
+.lr-studio .studio-site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  min-height: 54px;
+  padding: 12px 24px;
+  border-top: 1px solid #e6ecf5;
+  background: #fff;
+  color: #718199;
+  font-size: 12px;
+}
+.lr-studio .studio-site-footer nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lr-studio .studio-site-footer a:hover {
+  color: #245de0;
+  text-decoration: underline;
+}
 .lr-studio .studio-workspace {
   width: calc(100% - 48px);
   max-width: none;

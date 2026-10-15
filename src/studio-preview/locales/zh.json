@@ -527,5 +527,8 @@
   "Preview choices only. Connect your key to check availability and generate.": "当前仅预览选项、不产生费用；真实生成需接入 Key 并确认付费。",
   "Your saved option is unavailable for this key. Review the available selection before generating.": "上次选择的组合对此 Key 不可用，已显示可用选项，请在生成前确认。",
   "Billing changed to an available option for this version. Review it before generating.": "此版本不支持原计费方式，已切换至可用方式，请在生成前确认。",
-  "This saved model is no longer available for this key. Select a model before generating.": "这条记录的原型号已不在当前 Key 的可用列表中，请重新选择后再生成。"
+  "This saved model is no longer available for this key. Select a model before generating.": "这条记录的原型号已不在当前 Key 的可用列表中，请重新选择后再生成。",
+  "Legal information": "法律信息",
+  "Privacy Policy": "隐私政策",
+  "Terms of Service": "服务条款"
 }

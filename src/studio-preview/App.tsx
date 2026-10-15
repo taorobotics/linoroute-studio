@@ -290,6 +290,8 @@ function StudioShell(props: StudioPreviewProps) {
                       label: 'Source and licenses',
                       href: '/source.html',
                     },
+                    { label: 'Privacy Policy', href: '/privacy/' },
+                    { label: 'Terms of Service', href: '/terms/' },
                   ].map(({ label, href }) => (
                     <a
                       key={href}
@@ -451,6 +453,13 @@ function StudioShell(props: StudioPreviewProps) {
             ))}
         </main>
       </div>
+      <footer className='studio-site-footer'>
+        <span>© {new Date().getFullYear()} LinoRoute</span>
+        <nav aria-label={t('Legal information')}>
+          <a href='/privacy/'>{t('Privacy Policy')}</a>
+          <a href='/terms/'>{t('Terms of Service')}</a>
+        </nav>
+      </footer>
       {keyDialogOpen && (
         <KeyDialog
           demoEnabled={demoEnabled}

@@ -205,6 +205,37 @@ it('preserves existing platform links in the header resources popover', async ()
   )
 })
 
+it.each(['zh', 'en'] as const)(
+  'links to public privacy and terms pages from the %s studio shell',
+  async (locale) => {
+    render(<StudioPreviewApp store={createMemoryStore()} locale={locale} />)
+
+    const footer = screen.getByRole('contentinfo')
+    const privacyName = locale === 'zh' ? '隐私政策' : 'Privacy Policy'
+    const termsName = locale === 'zh' ? '服务条款' : 'Terms of Service'
+    expect(
+      within(footer).getByRole('link', { name: privacyName })
+    ).toHaveAttribute('href', '/privacy/')
+    expect(
+      within(footer).getByRole('link', { name: termsName })
+    ).toHaveAttribute('href', '/terms/')
+
+    const resourcesName = locale === 'zh' ? '更多入口' : 'Resources'
+    fireEvent.click(screen.getByRole('button', { name: resourcesName }))
+    const resources = within(
+      await screen.findByRole('dialog', { name: resourcesName })
+    )
+    expect(resources.getByRole('link', { name: privacyName })).toHaveAttribute(
+      'href',
+      '/privacy/'
+    )
+    expect(resources.getByRole('link', { name: termsName })).toHaveAttribute(
+      'href',
+      '/terms/'
+    )
+  }
+)
+
 it('keeps a visible warning when durable browser storage is unavailable', () => {
   render(
     <StudioPreviewApp

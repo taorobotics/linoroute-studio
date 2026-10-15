@@ -527,5 +527,8 @@
   "Preview choices only. Connect your key to check availability and generate.": "Preview choices only. Connect your key to check availability and generate.",
   "Your saved option is unavailable for this key. Review the available selection before generating.": "Your saved option is unavailable for this key. Review the available selection before generating.",
   "Billing changed to an available option for this version. Review it before generating.": "Billing changed to an available option for this version. Review it before generating.",
-  "This saved model is no longer available for this key. Select a model before generating.": "This saved model is no longer available for this key. Select a model before generating."
+  "This saved model is no longer available for this key. Select a model before generating.": "This saved model is no longer available for this key. Select a model before generating.",
+  "Legal information": "Legal information",
+  "Privacy Policy": "Privacy Policy",
+  "Terms of Service": "Terms of Service"
 }

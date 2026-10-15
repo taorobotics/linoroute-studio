@@ -15,6 +15,8 @@ Latest changes: [Changelog / 更新日志](CHANGELOG.md).
 - **Live demo:** [studio.linoroute.com](https://studio.linoroute.com)
 - **Recommended compatible API:** [LinoRoute](https://linoroute.com)
 - **API documentation:** [ninoroute.com/tutorials](https://ninoroute.com/tutorials/00-intro)
+- **Privacy Policy:** [studio.linoroute.com/privacy/](https://studio.linoroute.com/privacy/)
+- **Terms of Service:** [studio.linoroute.com/terms/](https://studio.linoroute.com/terms/)
 
 You can explore the interface and prompt libraries without a key. Real
 generation requires an API key supplied by the user. LinoRoute is the default
