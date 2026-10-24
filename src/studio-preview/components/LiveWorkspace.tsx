@@ -899,17 +899,19 @@ export function LiveWorkspace(props: {
             {outputs.find((entry) => entry.size === size)?.experimental && (
               <p className='studio-model-selection-notice'>
                 {t(
-                  'Experimental 4K may take longer and cost more. Review the size and billing before confirming.'
+                  'This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request will be sent.'
                 )}
               </p>
             )}
-            {props.kind === 'image' && size === '4K' && (
-              <p className='studio-model-selection-notice'>
-                {t(
-                  '4K may take longer and cost more. Review the resolution and billing before confirming.'
-                )}
-              </p>
-            )}
+            {props.kind === 'image' &&
+              size === '4K' &&
+              !outputs.find((entry) => entry.size === size)?.experimental && (
+                <p className='studio-model-selection-notice'>
+                  {t(
+                    '4K may take longer and cost more. Review the resolution and billing before confirming.'
+                  )}
+                </p>
+              )}
             <div className='studio-inline-actions'>
               <Dialog.Close className='studio-secondary-button'>
                 {t('Cancel')}

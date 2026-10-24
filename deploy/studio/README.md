@@ -67,7 +67,10 @@ them to your server before enabling them:
 
 1. Build with `bun run build`. Place the contents of `dist-studio-preview/` in
    your static web root (the example uses `/opt/linoroute-studio/current/site`).
-   Place `studio-error.json` in that web root as well.
+   Place `studio-error.json` in that web root as well. If you deploy with a
+   release symlink, copy `deploy/studio/oss_signer.py` to the matching release
+   at `config/oss_signer.py`; the systemd unit resolves the signer from
+   `/opt/linoroute-studio/current/config/oss_signer.py`.
 2. Put `nginx-site.conf` and `nginx-security.conf` in
    `/etc/nginx/linoroute-studio/`. Include `nginx-globals.conf` once in Nginx's
    `http` context, and load the HTTP/HTTPS server templates using your normal
@@ -82,8 +85,11 @@ them to your server before enabling them:
    `requirements.txt`, and adapt the paths and service user in
    `linoroute-studio-oss.service`. Its signer listens only on loopback. Use the
    service account permissions supported by your deployment.
-5. Run `nginx -t`, then reload through your server's service manager. Check
-   `/healthz`, the page, Key configuration, and uploads on your own domain.
+5. Run `nginx -t`, then reload through your server's service manager. Check the
+   page, Key configuration, and uploads on your own domain. The signer template
+   exposes signed preview assets rather than a `/healthz` endpoint; use
+   `systemctl is-active linoroute-studio-oss` and a GET to a known preview URL
+   as its health check.
 
 The production relay forwards the user's supplied key to allowlisted endpoints.
 It does not use a shared master key. Preserve HTTPS, origin checks, request

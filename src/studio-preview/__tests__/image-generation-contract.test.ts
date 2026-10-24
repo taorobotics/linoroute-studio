@@ -162,7 +162,6 @@ it.each([
   ['3:2', '1536x1024'],
   ['2:3', '1024x1536'],
   ['1:1', '2048x2048'],
-  ['16:9', '3840x2160'],
 ])(
   'GPT 2 per-request sends verified %s size %s without an n parameter',
   async (ratio, size) => {
@@ -182,6 +181,20 @@ it.each([
   }
 )
 
+it('rejects experimental GPT Image 2 4K before a paid request', async () => {
+  const transport = vi.fn(async () => reply())
+  await expect(
+    submitLive(
+      'sk-test',
+      model('gpt-image-2-c'),
+      { ...base, ratio: '16:9', size: '3840x2160' },
+      new AbortController().signal,
+      transport
+    )
+  ).rejects.toMatchObject({ code: 'unsupported_resolution' })
+  expect(transport).not.toHaveBeenCalled()
+})
+
 it.each(['gpt-image-2.5-flare', 'gpt-image-2.5-sunburst'])(
   '%s sends every documented size without confusing ratio and pixels',
   async (id) => {
@@ -191,8 +204,6 @@ it.each(['gpt-image-2.5-flare', 'gpt-image-2.5-sunburst'])(
       ['3:2', '1536x1024'],
       ['2:3', '1024x1536'],
       ['16:9', '2048x1152'],
-      ['16:9', '3840x2160'],
-      ['9:16', '2160x3840'],
       ['auto', 'auto'],
     ]) {
       const transport = vi.fn(async () => reply())
@@ -323,8 +334,8 @@ it('GPT 2.5 generation sends the documented request controls', async () => {
     {
       ...base,
       mode: 'text',
-      ratio: '9:16',
-      size: '2160x3840',
+      ratio: '16:9',
+      size: '2048x1152',
       quality: 'max',
       format: 'png',
       background: 'transparent',
@@ -339,7 +350,7 @@ it('GPT 2.5 generation sends the documented request controls', async () => {
   expect(JSON.parse(String(request[0][1].body))).toEqual({
     model: 'gpt-image-2.5-flare',
     prompt: base.prompt,
-    size: '2160x3840',
+    size: '2048x1152',
     quality: 'max',
     format: 'png',
     background: 'transparent',
@@ -465,7 +476,7 @@ it('GPT Image 2 generation sends the documented size, quality, format and fixed 
       ...base,
       mode: 'text',
       ratio: '16:9',
-      size: '3840x2160',
+      size: '2048x1152',
       quality: 'low',
       format: 'webp',
     },
@@ -479,7 +490,7 @@ it('GPT Image 2 generation sends the documented size, quality, format and fixed 
   expect(JSON.parse(String(request[0][1].body))).toEqual({
     model: 'gpt-image-2',
     prompt: base.prompt,
-    size: '3840x2160',
+    size: '2048x1152',
     quality: 'low',
     format: 'webp',
     n: 1,

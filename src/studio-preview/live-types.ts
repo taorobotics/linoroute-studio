@@ -106,6 +106,8 @@ export const LIVE_ERRORS: Record<string, string> = {
     'The upstream is busy or rate limited. Please wait before trying again.',
   request_rejected:
     'The upstream rejected these parameters. Check the model, key group and API documentation.',
+  unsupported_resolution:
+    'This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request was sent and no credits were charged.',
   submission_unknown:
     'Submission could not be confirmed. It may already be billed. Check the console before generating again.',
   query_failed:

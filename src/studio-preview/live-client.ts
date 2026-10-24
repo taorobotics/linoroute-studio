@@ -255,6 +255,17 @@ export async function submitLive(
     ) {
       throw new LiveError('invalid_parameters')
     }
+    // 4K is documented as experimental, but the active OpenAI-compatible
+    // routes are not consistently provisioned for it. Reject locally before
+    // the paid request so an upstream parameter error cannot consume credits.
+    if (
+      options.some(
+        (entry) =>
+          entry.ratio === ratio && entry.size === size && entry.experimental
+      )
+    ) {
+      throw new LiveError('unsupported_resolution')
+    }
     if (
       requestOptions &&
       (!quality ||

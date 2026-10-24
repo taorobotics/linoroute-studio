@@ -71,6 +71,8 @@
   "4K · Experimental": "4K · Experimental",
   "Choose a size explicitly. This ratio only has an experimental 4K preset.": "Choose a size explicitly. This ratio only has an experimental 4K preset.",
   "Experimental 4K may take longer and cost more. Review the size and billing before confirming.": "Experimental 4K may take longer and cost more. Review the size and billing before confirming.",
+  "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request will be sent.": "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request will be sent.",
+  "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request was sent and no credits were charged.": "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request was sent and no credits were charged.",
   "The model chooses the output size. Final dimensions and charges may vary.": "The model chooses the output size. Final dimensions and charges may vary.",
   "Image editing is not confirmed for this billing option. Choose a documented by-token model or Nano Banana Pro; billing will not switch automatically.": "Image editing is not confirmed for this billing option. Choose a documented by-token model or Nano Banana Pro; billing will not switch automatically.",
   "Output settings changed to match this model. Review them before generating.": "Output settings changed to match this model. Review them before generating.",

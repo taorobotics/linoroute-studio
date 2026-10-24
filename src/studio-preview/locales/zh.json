@@ -71,6 +71,8 @@
   "4K · Experimental": "4K · 实验性",
   "Choose a size explicitly. This ratio only has an experimental 4K preset.": "此比例目前仅提供实验性 4K 尺寸，请主动选择后再生成。",
   "Experimental 4K may take longer and cost more. Review the size and billing before confirming.": "实验性 4K 可能增加等待时间和费用，请确认尺寸及计费方式。",
+  "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request will be sent.": "当前通道暂未开放实验性 4K，请选择 2K 或更低分辨率；不会发送请求。",
+  "This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request was sent and no credits were charged.": "当前通道暂未开放实验性 4K，请选择 2K 或更低分辨率；未发送请求，不会扣除额度。",
   "The model chooses the output size. Final dimensions and charges may vary.": "由模型决定输出尺寸，实际尺寸与费用可能变化。",
   "Image editing is not confirmed for this billing option. Choose a documented by-token model or Nano Banana Pro; billing will not switch automatically.": "当前计费选项的图生接口尚待确认。可手动选择有文档支持的按量型号或 Nano Banana Pro；系统不会自动切换计费。",
   "Output settings changed to match this model. Review them before generating.": "已调整为当前型号支持的画面规格，请在生成前确认。",

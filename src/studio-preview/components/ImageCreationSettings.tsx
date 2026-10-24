@@ -161,6 +161,7 @@ export function ImageOutputSettings(props: {
                   type='radio'
                   name={id}
                   checked={props.size === option.size}
+                  disabled={props.disabled || option.experimental}
                   onChange={() => props.onChange(props.ratio, option.size)}
                 />
                 <span>
@@ -234,7 +235,7 @@ export function ImageOutputSettings(props: {
       {experimental && (
         <p className='studio-model-selection-notice' role='status'>
           {t(
-            'Experimental 4K may take longer and cost more. Review the size and billing before confirming.'
+            'This experimental 4K preset is not enabled for the active route. Choose 2K or lower; no request will be sent.'
           )}
         </p>
       )}
