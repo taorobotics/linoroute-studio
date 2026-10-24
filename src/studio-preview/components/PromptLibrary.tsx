@@ -5,7 +5,6 @@ import { Dialog } from '@base-ui/react/dialog'
 import {
   ArrowRight,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Copy,
@@ -267,9 +266,9 @@ export function PromptLibrary(props: {
   const [category, setCategory] = useState('all')
   const [model, setModel] = useState<'all' | PromptModel>('all')
   const [copiedId, setCopiedId] = useState('')
-  const [expandedId, setExpandedId] = useState('')
   const [previewedId, setPreviewedId] = useState('')
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [videoPromptId, setVideoPromptId] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [imagePrompts, setImagePrompts] = useState<ImagePromptCatalogItem[]>([])
   const [videoPrompts, setVideoPrompts] = useState<VideoPromptCatalogItem[]>([])
@@ -352,6 +351,15 @@ export function PromptLibrary(props: {
     (item) => getPromptItemId(item) === previewedId
   )
   const previewItem = previewIndex >= 0 ? visibleImages[previewIndex] : null
+  const videoPromptItem = visiblePrompts.find(
+    (item, index) =>
+      isVideoCatalogItem(item) &&
+      `${item.sourceId}:${item.id}:${pageStart + index}` === videoPromptId
+  )
+  const selectedVideoPrompt =
+    videoPromptItem && isVideoCatalogItem(videoPromptItem)
+      ? videoPromptItem
+      : null
   const pageTokens = getPageTokens(safeCurrentPage, totalPages)
   const sourceIds = isImage ? IMAGE_SOURCE_IDS : VIDEO_SOURCE_IDS
   const sources = PROMPT_SOURCES.filter((source) => sourceIds.has(source.id))
@@ -363,8 +371,8 @@ export function PromptLibrary(props: {
       return
     }
     setCurrentPage(nextPage)
-    setExpandedId('')
     setPreviewedId('')
+    setVideoPromptId('')
     window.requestAnimationFrame(() => {
       const reducedMotion = window.matchMedia?.(
         '(prefers-reduced-motion: reduce)'
@@ -410,8 +418,8 @@ export function PromptLibrary(props: {
             onChange={(event) => {
               setQuery(event.target.value)
               setCurrentPage(1)
-              setExpandedId('')
               setPreviewedId('')
+              setVideoPromptId('')
             }}
           />
           <kbd>{filtered.length}</kbd>
@@ -446,8 +454,8 @@ export function PromptLibrary(props: {
             onClick={() => {
               setModel('all')
               setCurrentPage(1)
-              setExpandedId('')
               setPreviewedId('')
+              setVideoPromptId('')
             }}
           >
             {t('All models')}
@@ -460,8 +468,8 @@ export function PromptLibrary(props: {
               onClick={() => {
                 setModel(item)
                 setCurrentPage(1)
-                setExpandedId('')
                 setPreviewedId('')
+                setVideoPromptId('')
               }}
             >
               {item}
@@ -484,8 +492,8 @@ export function PromptLibrary(props: {
               onClick={() => {
                 setCategory(option.id)
                 setCurrentPage(1)
-                setExpandedId('')
                 setPreviewedId('')
+                setVideoPromptId('')
               }}
             >
               {option.label}
@@ -546,7 +554,6 @@ export function PromptLibrary(props: {
             const itemCategory = isZh ? item.categoryZh : item.categoryEn
             const source = getPromptSource(item.sourceId)
             const itemInstanceId = `${item.sourceId}:${item.id}:${pageStart + index}`
-            const isExpanded = expandedId === itemInstanceId
             return (
               <article
                 key={itemInstanceId}
@@ -605,26 +612,18 @@ export function PromptLibrary(props: {
                       </div>
                       <h2>{title}</h2>
                       <p className='studio-prompt-description'>{description}</p>
-                      <blockquote data-expanded={isExpanded ? 'true' : 'false'}>
-                        {prompt}
-                      </blockquote>
-                      {prompt.length > 220 ? (
-                        <button
-                          type='button'
-                          className='studio-prompt-expand'
-                          aria-expanded={isExpanded}
-                          onClick={() =>
-                            setExpandedId(isExpanded ? '' : itemInstanceId)
-                          }
-                        >
-                          {t(
-                            isExpanded
-                              ? 'Collapse prompt'
-                              : 'Expand full prompt'
-                          )}
-                          <ChevronDown size={14} aria-hidden='true' />
-                        </button>
-                      ) : null}
+                      <blockquote>{prompt}</blockquote>
+                      <button
+                        type='button'
+                        className='studio-prompt-expand'
+                        aria-label={t('Open video prompt: {{title}}', {
+                          title,
+                        })}
+                        onClick={() => setVideoPromptId(itemInstanceId)}
+                      >
+                        <Maximize2 size={14} aria-hidden='true' />
+                        {t('View full prompt')}
+                      </button>
                       <div className='studio-prompt-tags'>
                         {tags.map((tag) => (
                           <span key={tag}>{tag}</span>
@@ -719,6 +718,7 @@ export function PromptLibrary(props: {
               setModel('all')
               setCurrentPage(1)
               setPreviewedId('')
+              setVideoPromptId('')
             }}
           >
             {t('Clear filters')}
@@ -950,6 +950,144 @@ export function PromptLibrary(props: {
                     </button>
                   </div>
                 </footer>
+              </>
+            ) : null}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <Dialog.Root
+        open={Boolean(selectedVideoPrompt)}
+        onOpenChange={(open) => {
+          if (!open) setVideoPromptId('')
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className='studio-image-preview-backdrop' />
+          <Dialog.Popup className='studio-video-prompt-dialog'>
+            {selectedVideoPrompt ? (
+              <>
+                <div className='studio-video-prompt-topbar'>
+                  <Dialog.Title className='studio-video-prompt-label'>
+                    {t('Video prompt')}
+                  </Dialog.Title>
+                  <Dialog.Close
+                    className='studio-image-preview-close'
+                    aria-label={t('Close video prompt')}
+                  >
+                    <X size={19} aria-hidden='true' />
+                  </Dialog.Close>
+                </div>
+                <Dialog.Description className='studio-sr-only'>
+                  {t('Full video preview and prompt details')}
+                </Dialog.Description>
+                <div className='studio-video-prompt-content'>
+                  <div className='studio-video-prompt-media'>
+                    <video
+                      src={selectedVideoPrompt.videoUrl}
+                      poster={selectedVideoPrompt.videoPosterUrl}
+                      controls
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload='metadata'
+                      aria-label={
+                        isZh
+                          ? selectedVideoPrompt.videoAltZh
+                          : selectedVideoPrompt.videoAltEn
+                      }
+                    />
+                  </div>
+                  <div className='studio-video-prompt-details'>
+                    <div className='studio-image-preview-details-heading'>
+                      <span>
+                        {isZh
+                          ? selectedVideoPrompt.categoryZh
+                          : selectedVideoPrompt.categoryEn}
+                      </span>
+                      <strong>
+                        {isZh
+                          ? selectedVideoPrompt.titleZh
+                          : selectedVideoPrompt.titleEn}
+                      </strong>
+                    </div>
+                    <p className='studio-video-prompt-description'>
+                      {isZh
+                        ? selectedVideoPrompt.descriptionZh
+                        : selectedVideoPrompt.descriptionEn}
+                    </p>
+                    <div className='studio-image-preview-prompt-heading'>
+                      <span>{t('Prompt')}</span>
+                      <button
+                        type='button'
+                        className='studio-image-preview-copy'
+                        onClick={() => {
+                          const value = isZh
+                            ? selectedVideoPrompt.promptZh
+                            : selectedVideoPrompt.promptEn
+                          void copyText(value).then(() => {
+                            setCopiedId(videoPromptId)
+                            window.setTimeout(() => setCopiedId(''), 1600)
+                          })
+                        }}
+                      >
+                        {copiedId === videoPromptId ? (
+                          <Check size={14} aria-hidden='true' />
+                        ) : (
+                          <Copy size={14} aria-hidden='true' />
+                        )}
+                        {t(
+                          copiedId === videoPromptId ? 'Copied' : 'Copy prompt'
+                        )}
+                      </button>
+                    </div>
+                    <blockquote className='studio-video-prompt-text'>
+                      {isZh
+                        ? selectedVideoPrompt.promptZh
+                        : selectedVideoPrompt.promptEn}
+                    </blockquote>
+                    <div className='studio-prompt-tags studio-image-preview-tags'>
+                      {(isZh
+                        ? selectedVideoPrompt.tagsZh
+                        : selectedVideoPrompt.tagsEn
+                      ).map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                    <div className='studio-prompt-attribution studio-video-prompt-attribution'>
+                      <span>
+                        {t('Source')}:{' '}
+                        <strong>
+                          {getPromptSource(selectedVideoPrompt.sourceId).name}
+                        </strong>
+                      </span>
+                      <a
+                        href={selectedVideoPrompt.sourceCaseUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        {t('Original case')}
+                        <ExternalLink size={12} aria-hidden='true' />
+                      </a>
+                    </div>
+                    <button
+                      type='button'
+                      className='studio-prompt-use studio-image-preview-use'
+                      onClick={() => {
+                        props.onUse(
+                          isZh
+                            ? selectedVideoPrompt.promptZh
+                            : selectedVideoPrompt.promptEn
+                        )
+                        setVideoPromptId('')
+                      }}
+                    >
+                      {t('Use for video creation')}
+                      <ArrowRight size={16} aria-hidden='true' />
+                    </button>
+                  </div>
+                </div>
               </>
             ) : null}
           </Dialog.Popup>

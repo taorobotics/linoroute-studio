@@ -173,7 +173,22 @@ it('shows playable sourced video cases and sends a prompt to video creation', as
     expect.stringMatching(/^https:\/\/.+\.mp4$/)
   )
 
-  fireEvent.click(within(card).getByRole('button', { name: '用于视频创作' }))
+  fireEvent.click(
+    within(card).getByRole('button', {
+      name: '打开视频提示词：Car Sketch 3D',
+    })
+  )
+  const promptDialog = await screen.findByRole('dialog', {
+    name: '视频提示词',
+  })
+  expect(
+    within(promptDialog).getByText(
+      /A car sketch on paper\. The camera pushes in\./
+    )
+  ).toBeVisible()
+  fireEvent.click(
+    within(promptDialog).getByRole('button', { name: '用于视频创作' })
+  )
   expect(screen.getByRole('heading', { name: '视频创作' })).toBeVisible()
   expect(
     (screen.getByRole('textbox', { name: '提示词' }) as HTMLTextAreaElement)
